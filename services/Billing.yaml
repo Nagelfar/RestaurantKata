@@ -1,0 +1,134 @@
+openapi: 3.0.3
+info:
+  title: Billing
+  description: |
+      Keeps track of ordered items from a guest to create bills for them and offers the guest a possibility to pay their bills with different payment methods
+  version: 1.0.0
+paths:
+  /bills/{guest}:
+    get:
+      summary: Generates the bill for a guest
+      description: |
+        Returns the ordered items of the customer together with a total sum
+      responses:
+        "200":
+          description: Bill generated successfully 
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/bill"
+  /payment/{bill}:
+    get:
+      summary: Returns the payment options for this bill
+      description: |
+        Depending on the amount of the bill different payment options may be offered
+      responses:
+        "200":
+          description: Describes the supported payment options
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/paymentOptions"
+    post:
+      summary: Pays the bill
+      description: |
+        Marks the bill as payed
+      requestBody:
+        required: true
+        content:  
+          application/json:
+            schema:
+              $ref: "#/components/schemas/billPayment"
+      responses:
+        "202":
+          description: Payment was accepted for this bill
+        "406":
+          description: The payment method was not accepted and a supported one should be chosen
+          content:
+            text/html:
+                schema:
+                  $ref: "#/components/schemas/errorMessage"
+                example: Please use a supported payment method for this bill
+        "416":
+          description: The transfered amount was not sufficient
+          content:
+            text/html:
+                schema:
+                  $ref: "#/components/schemas/errorMessage"
+                example: Please pay at least 123.45 euros for this bill
+        "410":
+          description: The bill is not open and was either payed or cancelled
+          content:
+            text/html:
+                schema:
+                  $ref: "#/components/schemas/errorMessage"
+                example: No payment for the bill required
+          
+
+components:
+  parameters:
+    guestParam:
+      description: Identifier of a guest in the restaurant
+      name: guest
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/identifier"
+    billParam:
+      description: Identifier of a bill
+      name: bill
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/identifier"
+  schemas:
+    errorMessage:
+      type: string
+      maxLength: 256
+      description: A text message describing an error
+    identifier:
+      type: integer
+      minimum: 0
+      example: 1
+    identifiers:
+      type: array
+      items:
+        $ref: "#/components/schemas/identifier"
+    money:
+      type: number
+      description: Euros
+      minimum: 0
+      example: 10.0
+    paymentMethod:
+      type: string
+      description: Available payment method in the restauraunt
+      enum: ["Cash", "DebitCard", "CreditCard"]
+      example: "Cash"    
+    bill:
+      type: object
+      properties:
+        bill:
+          $ref: "#/components/schemas/identifier"
+        orderedItems:
+          type: array
+          minimum: 1
+          items:
+            $ref: "#/components/schemas/identifiers"
+        totalSum:
+          description: Contains the total amount of ordered items
+          $ref: "#/components/schemas/money"
+    paymentOptions:
+      type: array
+      description: Supported payment options
+      items:
+        minimum: 1
+        $ref: "#/components/schemas/paymentMethod"
+    billPayment:
+      type: object
+      properties:
+        amount:
+          description: Contains the total amount for the payment, including tips
+          $ref: "#/components/schemas/money"
+        paymentMethod:
+          description: the chosen payment method
+          $ref: "#/components/schemas/money"

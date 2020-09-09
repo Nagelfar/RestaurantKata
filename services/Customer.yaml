@@ -1,0 +1,83 @@
+openapi: 3.0.3
+info:
+  title: Customer
+  description: |
+    Offers interaction with the guest
+  version: 1.0.0
+tags:
+  - name: guest
+paths:
+  /guest/{guest}?order={order}:
+    parameters:
+        - $ref: "#/components/parameters/guestParam"
+        - $ref: "#/components/parameters/orderParam"
+    post:
+      summary: Delivery for expected food & drinks
+      description: Once food and drinks are prepared the can be delivered to the guest via this endpoint
+      tags:
+        - Gameplay
+      operationId: post-order-received
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/order"
+      responses:
+        "200":
+          description: "OK"
+        #   content:
+        #     application/json:
+        #       schema:
+        #         $ref: "#/components/schemas/status"
+        "404":
+            description: The guest is not registered in the restaurant
+            content:
+              text/html:
+                schema:
+                  $ref: "#/components/schemas/errorMessage"
+                example: "The guest is unknown"
+        "400":
+            description: The provided order is invalid for the guest
+            content:
+              text/html:
+                schema:
+                  $ref: "#/components/schemas/errorMessage"
+                example: "The guest did not place this order."
+
+components:
+  parameters:
+    guestParam:
+      description: Identifier of a guest in the restaurant
+      name: guest
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/identifier"
+    orderParam:
+      description: Identifier of an order in the restaurant
+      name: order
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/identifier"
+  schemas:
+    errorMessage:
+      type: string
+      maxLength: 256
+      description: A text message describing an error
+    identifier:
+      type: integer
+      minimum: 0
+      example: 1
+    identifiers:
+      type: array
+      items:
+        $ref: "#/components/schemas/identifier"
+    order:
+      type: object
+      properties:
+        food:
+          $ref: "#/components/schemas/identifiers"
+        drinks:
+          $ref: "#/components/schemas/identifiers"

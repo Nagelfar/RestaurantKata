@@ -1,0 +1,121 @@
+openapi: 3.0.3
+info:
+  title: Guest experience
+  description: |
+      Creates a menu with daily offers for customers which is compliant to legal rules.
+  version: 1.0.0
+paths:
+  /menu:
+    get:
+      summary: Creates a menu with daily offers for customers which is compliant to legal rules.
+      description: |
+        Returns a guest identifier together with a menu structure containing the menu-ids together with nutrition and price 
+      operationId: get-menu
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/menu"
+
+components:
+  parameters:
+    guestParam:
+      description: Identifier of a guest in the restaurant
+      name: guest
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/identifier"
+    orderParam:
+      description: Identifier of an order in the restaurant
+      name: order
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/identifier"
+  schemas:
+    errorMessage:
+      type: string
+      maxLength: 256
+      description: A text message describing an error
+    money:
+      type: number
+      description: Euros
+      minimum: 0
+      example: 10.0
+    nutrition:
+      type: string
+      enum: ["A", "B", "C", "D", "E", "F", "G", "H","L","M","N","O","P","R"]
+      description: |
+        Contains the nutrition information according to Austrian law, see <https://www.wko.at/branchen/tourismus-freizeitwirtschaft/gastronomie/weiterfuehrende_infos_allergene.html>
+      example: "A"
+    identifier:
+      type: integer
+      minimum: 0
+      example: 1
+    menuItem:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/identifier"
+        name:
+          type: string
+          maxLength: 50
+          description: A name describing the menu item
+          example: Wiener Schnitzel
+        nutrition:
+          type: array
+          minimum: 0
+          items:
+            $ref: "#/components/schemas/nutrition"
+        price:
+          $ref: "#/components/schemas/money"
+    menu:
+      type: object
+      properties:
+        guest:
+          $ref: "#/components/schemas/identifier"
+        food:
+          type: array
+          minimum: 1
+          items:
+            $ref: "#/components/schemas/menuItem"
+        drinks:
+          type: array
+          minimum: 1
+          items:
+            $ref: "#/components/schemas/menuItem"
+      # example: |
+      #   {
+      #     "guestID": 2,
+      #     "food" : [
+      #           {
+      #               "foodId": 1,
+      #               "name": "Burger",
+      #               "nutrition": [ "10a", "1", "8a"],
+      #               "price": 20.2
+      #           },
+      #           {
+      #               "foodId": 2,
+      #               "name": "Wiener Schnitzel",
+      #               "nutrition": [ "10a", "3"],
+      #               "price": 10.2
+      #           }
+      #     ],
+      #     "drink": [
+      #           {
+      #               "drinkId": 1,
+      #               "name": "Soda",
+      #               "nutrition": [ "11a"],
+      #               "price": 4.4
+      #           },
+      #           {
+      #               "drinkId": 2,
+      #               "name": "Beer",
+      #               "nutrition": [],
+      #               "price": 5.4
+      #           }
+      #     ]
+      #   }

@@ -1,0 +1,65 @@
+openapi: 3.0.3
+info:
+  title: Table service
+  description: |
+      Creates a menu with daily offers for customers which is compliant to legal rules.
+  version: 1.0.0
+paths:
+  /orders:
+    post:
+      summary: Issues a new order
+      description: |
+        Issues an order with the waiter with the guest id and a list of food and drink items, while awaiting an estimated waiting 
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/order"
+      responses:
+        "200":
+          description: Order placed successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/orderConfirmation"
+components:
+  schemas:
+    errorMessage:
+      type: string
+      maxLength: 256
+      description: A text message describing an error
+    identifier:
+      type: integer
+      minimum: 0
+      example: 1
+    identifiers:
+      type: array
+      items:
+        $ref: "#/components/schemas/identifier"
+    duration:
+      type: string
+      description: Duration in seconds
+      minimum: 0
+      example: 100
+    order:
+      type: object
+      properties:
+        guest:
+          $ref: "#/components/schemas/identifier"
+        food:
+          type: array
+          items:
+            $ref: "#/components/schemas/identifiers"
+        drinks:
+          type: array
+          items:
+            $ref: "#/components/schemas/identifiers"
+    orderConfirmation:
+      type: object
+      properties:
+        order:
+          $ref: "#/components/schemas/identifier"
+        waitingTime:
+          description: Estimated waiting time for the food
+          $ref: "#/components/schemas/duration"
