@@ -2,14 +2,14 @@ openapi: 3.0.3
 info:
   title: Guest experience
   description: |
-      Creates a menu with daily offers for customers which is compliant to legal rules.
+      Provides a menu with daily offers tailored to customers, which is compliant to the legal rules of the country.
   version: 1.0.0
 paths:
   /menu:
     get:
-      summary: Creates a menu with daily offers for customers which is compliant to legal rules.
+      summary: Request daily menu
       description: |
-        Returns a guest identifier together with a menu structure containing the menu-ids together with nutrition and price 
+        Returns a guest identifier together with a menu structure containing the menu itmes together with nutrition and price information.
       operationId: get-menu
       responses:
         "200":
@@ -18,6 +18,41 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/menu"
+              examples:
+                SmallMenu:
+                  summary: A small menu with two meals and two drinks
+                  value:
+                    {
+                      "guest": 2,
+                      "food" : [
+                            {
+                                "id": 1,
+                                "name": "Burger",
+                                "nutrition": [ "A", "B", "C"],
+                                "price": 20.2
+                            },
+                            {
+                                "id": 2,
+                                "name": "Wiener Schnitzel",
+                                "nutrition": [ "D", "E"],
+                                "price": 10.2
+                            }
+                      ],
+                      "drinks": [
+                            {
+                                "id": 1,
+                                "name": "Soda",
+                                "nutrition": [ "H"],
+                                "price": 4.4
+                            },
+                            {
+                                "id": 2,
+                                "name": "Beer",
+                                "nutrition": [],
+                                "price": 5.4
+                            }
+                      ]
+                    }
 
 components:
   parameters:
@@ -87,35 +122,3 @@ components:
           minimum: 1
           items:
             $ref: "#/components/schemas/menuItem"
-      # example: |
-      #   {
-      #     "guestID": 2,
-      #     "food" : [
-      #           {
-      #               "foodId": 1,
-      #               "name": "Burger",
-      #               "nutrition": [ "10a", "1", "8a"],
-      #               "price": 20.2
-      #           },
-      #           {
-      #               "foodId": 2,
-      #               "name": "Wiener Schnitzel",
-      #               "nutrition": [ "10a", "3"],
-      #               "price": 10.2
-      #           }
-      #     ],
-      #     "drink": [
-      #           {
-      #               "drinkId": 1,
-      #               "name": "Soda",
-      #               "nutrition": [ "11a"],
-      #               "price": 4.4
-      #           },
-      #           {
-      #               "drinkId": 2,
-      #               "name": "Beer",
-      #               "nutrition": [],
-      #               "price": 5.4
-      #           }
-      #     ]
-      #   }

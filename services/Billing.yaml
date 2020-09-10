@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Billing
   description: |
-      Keeps track of ordered items from a guest to create bills for them and offers the guest a possibility to pay their bills with different payment methods
+      Keeps track of ordered items from guests to create bills for them and offers the guest a possibility to pay their bills with different payment methods
   version: 1.0.0
 paths:
   /bills/{guest}:
@@ -12,11 +12,22 @@ paths:
         Returns the ordered items of the customer together with a total sum
       responses:
         "200":
-          description: Bill generated successfully 
+          description: Bill generated successfully
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/bill"
+              examples:
+                SingleOrder:
+                  summary: A bill containing a single order
+                  value:
+                    {
+                        "bill": 1,
+                        "orderedItems": [
+                            1
+                        ],
+                        "totalSum": 65.8
+                    }
   /payment/{bill}:
     get:
       summary: Returns the payment options for this bill
@@ -29,16 +40,33 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/paymentOptions"
+              examples:
+                OnePaymentOption:
+                  summary: A single payment option for the bill
+                  value:
+                    [ "Cash" ]
+                MultiplePaymentOption:
+                  summary: More payment option for the bill
+                  value:
+                    [ "Cash", "DebitCard" ]
     post:
       summary: Pays the bill
       description: |
         Marks the bill as payed
       requestBody:
         required: true
-        content:  
+        content:
           application/json:
             schema:
               $ref: "#/components/schemas/billPayment"
+            examples:
+              PayWithCash:
+                summary: Pays the bill with cash and tips
+                value:
+                  {
+                    "amount" : 70.0,
+                    "paymentMethod": "Cash"
+                  }
       responses:
         "202":
           description: Payment was accepted for this bill
@@ -63,7 +91,6 @@ paths:
                 schema:
                   $ref: "#/components/schemas/errorMessage"
                 example: No payment for the bill required
-          
 
 components:
   parameters:
@@ -103,7 +130,7 @@ components:
       type: string
       description: Available payment method in the restauraunt
       enum: ["Cash", "DebitCard", "CreditCard"]
-      example: "Cash"    
+      example: "Cash"
     bill:
       type: object
       properties:
@@ -131,4 +158,4 @@ components:
           $ref: "#/components/schemas/money"
         paymentMethod:
           description: the chosen payment method
-          $ref: "#/components/schemas/money"
+          $ref: "#/components/schemas/paymentMethod"

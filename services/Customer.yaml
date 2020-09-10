@@ -4,8 +4,6 @@ info:
   description: |
     Offers interaction with the guest
   version: 1.0.0
-tags:
-  - name: guest
 paths:
   /guest/{guest}?order={order}:
     parameters:
@@ -13,9 +11,8 @@ paths:
         - $ref: "#/components/parameters/orderParam"
     post:
       summary: Delivery for expected food & drinks
-      description: Once food and drinks are prepared the can be delivered to the guest via this endpoint
-      tags:
-        - Gameplay
+      description: |
+        Once food and drinks are prepared the can be delivered to the guest via this endpoint
       operationId: post-order-received
       requestBody:
         required: true
@@ -23,13 +20,31 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/order"
+            examples:
+              DrinksReceived:
+                summary: Receive drinks
+                value:
+                  {
+                    "food" : [],
+                    "drinks": [ 1, 2, 2 ]
+                  }
+              FirstBatchOfFoodDelivered:
+                summary: First batch of food items delivered
+                value:
+                  {
+                    "food" : [1, 1],
+                    "drinks": [ ]
+                  }
+              SecondBatchOfFoodDelivered:
+                summary: Second batch of food items delivered
+                value:
+                  {
+                    "food" : [ 2 ],
+                    "drinks": [ ]
+                  }
       responses:
         "200":
           description: "OK"
-        #   content:
-        #     application/json:
-        #       schema:
-        #         $ref: "#/components/schemas/status"
         "404":
             description: The guest is not registered in the restaurant
             content:

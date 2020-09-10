@@ -2,20 +2,37 @@ openapi: 3.0.3
 info:
   title: Table service
   description: |
-      Creates a menu with daily offers for customers which is compliant to legal rules.
+    Interacts with the guest and takes the orders from the menu
   version: 1.0.0
 paths:
   /orders:
     post:
-      summary: Issues a new order
+      summary: Place a new order
       description: |
-        Issues an order with the waiter with the guest id and a list of food and drink items, while awaiting an estimated waiting 
+        Place an order with the waiter containing the guest id and a list of food and drink items, while awaiting an estimated waiting
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/order"
+            examples:
+              OrderForThreePersons:
+                summary: Order food & drinks for three persons
+                value:
+                  {
+                    "guest": 2,
+                    "food" : [
+                          1,
+                          2,
+                          1
+                    ],
+                    "drink": [
+                          1,
+                          2,
+                          2
+                    ]
+                }
       responses:
         "200":
           description: Order placed successfully
