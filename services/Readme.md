@@ -6,15 +6,18 @@ Note: commands are expected to be executed from the `services` directory!
 
 ## Viewing a single service documentation
 
-To render a single documentation as HTML with [Redoc](https://hub.docker.com/r/redocly/redoc/) the following docker command can be used
+To render a single documentation as HTML several options exist.
 
-    docker run -it --rm \
-        -p 8080:80 \
-        -v $(pwd)/:/usr/share/nginx/html/specs \
-        -e SPEC_URL=specs/Customer.yaml \
-        redocly/redoc
+- a quick preview can be done via the online tool <https://editor.swagger.io/>
+- locally with the help of [Redoc](https://hub.docker.com/r/redocly/redoc/) and the following docker command:
 
-Note: specify the desired serice-yaml file instead of `Customer.yaml` and open the documentation at <http://localhost:8080>! 
+        docker run -it --rm \
+            -p 8000:80 \
+            -v $(pwd)/:/usr/share/nginx/html/specs \
+            -e SPEC_URL=specs/Customer.yaml \
+            redocly/redoc
+
+    Note: specify the desired service-yaml file instead of `Customer.yaml` and open the documentation at <http://localhost:8000>!
 
 ## Viewing all service documentations
 
@@ -54,3 +57,16 @@ The following things need to be customized:
 - if the whole API should be generated the `global-property` setting can be omitted (see [customization](https://openapi-generator.tech/docs/customization) and [global properties](https://openapi-generator.tech/docs/globals) for details)
 
 The generated files in the `generated/<<foldername>>` folder can then be used to bootstrap your API implementation.
+
+
+## Runing a fake server
+
+[Fakeit](https://github.com/justinfeng/fakeit) can be used to test an implementation with a fake server
+
+    docker run -t \
+        -v "${PWD}:/services" \
+        -p 8010:8080 realfengjia/fakeit:latest \
+        --spec /services/GuestExperience.yaml
+
+The fake server is reachable via <http://localhost:8010/>.
+To use provided examples of the OpenAPI file use `--use-example` as additional parameter
