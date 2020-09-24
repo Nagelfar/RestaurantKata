@@ -36,7 +36,7 @@ namespace Customer
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddHttpClient();
-            services.AddRazorPages();
+            services.AddRazorPages().AddRazorRuntimeCompilation();
 
             services.AddSingleton(new EventStore());
 
