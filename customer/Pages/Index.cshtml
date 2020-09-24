@@ -1,0 +1,18 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Retrieve Menu";
+}
+@if(Model.RetrievedMenu)
+{    
+    <p>
+        You already have <a asp-page="./Menu">a menu!</a>
+    </p>
+    <form method="POST">
+            <input class="btn btn-secondary" type="submit" asp-page-handler="RetrieveMenu" value="Retrieve a new version of the Menu" />
+    </form>
+} else {
+    <form method="POST">
+        <input class="btn btn-primary" type="submit" asp-page-handler="RetrieveMenu" value="Retrieve the Restaurants Menu" />
+    </form>
+}

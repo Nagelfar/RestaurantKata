@@ -55,7 +55,7 @@ components:
       items:
         $ref: "#/components/schemas/identifier"
     duration:
-      type: string
+      type: integer
       description: Duration in seconds
       minimum: 0
       example: 100
@@ -65,13 +65,9 @@ components:
         guest:
           $ref: "#/components/schemas/identifier"
         food:
-          type: array
-          items:
-            $ref: "#/components/schemas/identifiers"
+          $ref: "#/components/schemas/identifiers"
         drinks:
-          type: array
-          items:
-            $ref: "#/components/schemas/identifiers"
+          $ref: "#/components/schemas/identifiers"
     orderConfirmation:
       type: object
       properties:

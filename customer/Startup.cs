@@ -30,6 +30,10 @@ namespace Customer
                 .ConfigureHttpClient(client =>
                     client.BaseAddress = apiConfiguration.GetValue<Uri>("GuestExperience")
                 );
+            services.AddHttpClient("TableService")
+                .ConfigureHttpClient(client =>
+                    client.BaseAddress = apiConfiguration.GetValue<Uri>("TableService")
+                );
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.

@@ -1,0 +1,26 @@
+﻿@page
+@model OrdersModel
+@{
+    ViewData["Title"] = "Home page";
+}
+<div class="card-deck">
+    @foreach (var order in Model.Orders)
+    {
+        <div class="card">
+            <div class="card-header">
+                Order #<b>@order.Confirmation.Order</b> for Guest <b>@order.Guest</b>
+            </div>
+             <ul class="list-group list-group-flush">
+                    @foreach(var food in order.Order){
+                        <li class="list-group-item">
+                            @food.Name with @food.Price Euros
+                        </li>
+                    }
+                </ul>
+            
+            <div class="card-footer">
+                Estimated waiting time: @order.Confirmation.WaitingTime
+            </div>
+        </div>   
+    }
+</div>
