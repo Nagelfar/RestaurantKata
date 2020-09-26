@@ -21,7 +21,7 @@ To render a single documentation as HTML several options exist.
 
 ## Viewing all service documentations
 
-To view all service documentaion in one document use the following command
+To view all service documentation in one document use the following command
 
     docker run -it --rm \
         -p 8080:80 \
@@ -59,7 +59,7 @@ The following things need to be customized:
 The generated files in the `generated/<<foldername>>` folder can then be used to bootstrap your API implementation.
 
 
-## Runing a fake server
+## Running a fake server
 
 [Fakeit](https://github.com/justinfeng/fakeit) can be used to test an implementation with a fake server
 
