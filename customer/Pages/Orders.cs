@@ -57,6 +57,30 @@ namespace Customer.Pages
                 public DateTime DeliveredOn { get; set; }
             }
         }
+
+        public TimeSpan? OrderDuration
+        {
+            get
+            {
+                var receivedAtForItems =
+                    FoodOrder
+                        .Concat(DrinkOrder)
+                        .Select(x => x.ReceivedAt)
+                        .ToList();
+
+                if (receivedAtForItems.All(x => x != null))
+                {
+                    var minReceived = receivedAtForItems.Min(x => x.DeliveredOn);
+                    var maxReceived = receivedAtForItems.Max(x => x.DeliveredOn);
+                    var duration = maxReceived.Subtract(minReceived);
+
+                    return duration;
+
+                }
+                else return null;
+            }
+        }
+
     }
 
     public class OrdersModel : PageModel

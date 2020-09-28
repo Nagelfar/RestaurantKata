@@ -36,6 +36,11 @@
             
             <div class="card-footer">
                 Estimated waiting time: @order.Confirmation.WaitingTime
+
+                @if(order.OrderDuration.HasValue)
+                {
+                    <small class="text-success">Order completed after @order.OrderDuration.Value seconds</small>
+                }
             </div>
         </div>   
     }

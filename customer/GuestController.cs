@@ -24,7 +24,7 @@ namespace Customer
                  @event switch
                  {
                      OrderPlaced order =>
-                         state.Add(
+                         state.SetItem(
                              order.Guest,
                              state.GetValueOrDefault(order.Guest, ImmutableHashSet<int>.Empty).Add(order.Confirmation.Order)
                              ),

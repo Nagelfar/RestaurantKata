@@ -32,7 +32,7 @@
                                 <td>@foodItem.Price</td>
                                 <td>
                                     <input type="hidden" asp-for="Order.Food[i].Id" value="@foodItem.Id" />
-                                    <input type="number" asp-for="Order.Food[i].Quantity" class="form-control" />
+                                    <input type="number" asp-for="Order.Food[i].Quantity" class="form-control" min="0" />
                                 </td>
                             </tr>
                         }
