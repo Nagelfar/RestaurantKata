@@ -25,7 +25,7 @@ Guests represent outside users, who are interacting with the system:
 
 - request the menu, containing products with nutrition information
 - issues orders with the waiter for the selected products from the menu
-- receive food and drinks
+- waits to receive food and drinks
 - requests the bill and pays
 
 ### Guest experience - creating a pleasant visit
@@ -33,15 +33,16 @@ Guests represent outside users, who are interacting with the system:
 A manager designs the menu, which describes all the items served by the restaurant.
 
 - the menu with all of the items is presented to a customer. A item of the menu has a name, a nutrition information and a price.
-- to ensure the nutrition information is up-to-date with the ingredients served, details about them have to be retrieved from the cook.
-- the cashier asks for item prices
+- to ensure the nutrition information is up-to-date with the ingredients served, details about them are retrieved from the cook.
+- the cashier asks for current item prices
 
 ### Table service - helping the guest at the table
 
 A waitress/waiter interacts with the guest, who orders items from the menu.
 
 - takes the order for several menu items from guests
-- forwards the food order to the food preparation and responds to the customer with an estimated waiting time
+- forwards the food order to the food preparation
+- responds to the customer with an estimated waiting time based on information from the cook and his experience
 - forwards drink orders to delivery
 
 ### Food preparation - cooking a delicious meal
@@ -49,8 +50,10 @@ A waitress/waiter interacts with the guest, who orders items from the menu.
 A cook prepares meals in the order they are requested.
 
 - order for single menu items can be placed
-- estimated time for preparation is returned (calculated by the number of ingredients)
-- when a meal is prepared it is placed on the counter and delivery is notified
+- a meal preparation takes a defined time (calculated by the number of ingredients * 2, e.g. a meal with 4 ingredients takes 8 seconds to prepare)
+- you have a limited amount of cooks available (e.g. only 2 cooks can prepare meals and they are blocked for the preparation time)
+- the number of meals that are prepared before the requested one is returned (e.g. if two meals are about to prepared and another order is requested, food preparation would return 3)
+- when a meal is prepared (after it's preparation time) it is placed on the counter and delivery is notified
 - provides a list of cookable meals with name and nutrition information
 
 ### Delivery - serving items
@@ -74,7 +77,7 @@ The cashier keeps track of items a guest ordered and generates a bill.
 ## Part 1 - Building the system in a naive way
 
 The goal of the first exercise is to build each actor as a standalone application and connect them together to form a distributed system.
-We focus on bringing value to the guest, while learning about the rules and the behavior of the system.
+We focus on bringing value to the guest, while learning about the rules and the behavior of the system we develop.
 
 To keep things simple from a technical point of view, the following guidelines should be respected:
 

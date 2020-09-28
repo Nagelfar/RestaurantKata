@@ -41,6 +41,7 @@ namespace Customer
         {
             services.AddHttpClient();
             services.AddRazorPages().AddRazorRuntimeCompilation();
+            services.AddControllers();
 
             services.AddSingleton(new EventStore());
 
@@ -68,6 +69,7 @@ namespace Customer
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllers();
                 endpoints.MapRazorPages();
             });
         }

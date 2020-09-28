@@ -9,7 +9,7 @@ paths:
     get:
       summary: Request daily menu
       description: |
-        Returns a guest identifier together with a menu structure containing the menu itmes together with nutrition and price information.
+        Returns a guest identifier together with a menu structure containing the menu items together with nutrition and price information.
       operationId: get-menu
       responses:
         "200":

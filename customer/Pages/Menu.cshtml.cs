@@ -98,10 +98,8 @@ namespace Customer.Pages
             _events.Append(new OrderPlaced
             {
                 Guest = order.Guest,
-                Order =
-                    order.Food.Select(f => Menu.Food.Select(Convert).Single(x => x.Id == f))
-                    .Concat(order.Drinks.Select(d => Menu.Drinks.Select(Convert).Single(x => x.Id == d)))
-                    .ToList(),
+                FoodOrder = order.Food.Select(f => Menu.Food.Select(Convert).Single(x => x.Id == f)).ToList(),
+                DrinkOrder= order.Drinks.Select(d => Menu.Drinks.Select(Convert).Single(x => x.Id == d)).ToList(),
                 Confirmation = confirmation
             });
 

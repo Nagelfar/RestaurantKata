@@ -5,7 +5,7 @@ info:
     Offers interaction with the guest
   version: 1.0.0
 paths:
-  /guest/{guest}?order={order}:
+  /guest/{guest}/deliveries/{order}:
     parameters:
         - $ref: "#/components/parameters/guestParam"
         - $ref: "#/components/parameters/orderParam"
@@ -25,6 +25,7 @@ paths:
                 summary: Receive drinks
                 value:
                   {
+                    "delivery": 1,
                     "food" : [],
                     "drinks": [ 1, 2, 2 ]
                   }
@@ -32,6 +33,7 @@ paths:
                 summary: First batch of food items delivered
                 value:
                   {
+                    "delivery": 23,
                     "food" : [1, 1],
                     "drinks": [ ]
                   }
@@ -39,6 +41,7 @@ paths:
                 summary: Second batch of food items delivered
                 value:
                   {
+                    "delivery": 75,
                     "food" : [ 2 ],
                     "drinks": [ ]
                   }
@@ -92,6 +95,8 @@ components:
     order:
       type: object
       properties:
+        delivery:
+          $ref:  "#/components/schemas/identifier"
         food:
           $ref: "#/components/schemas/identifiers"
         drinks:

@@ -11,10 +11,26 @@
                 Order #<b>@order.Confirmation.Order</b> for Guest <b>@order.Guest</b>
             </div>
              <ul class="list-group list-group-flush">
-                    @foreach(var food in order.Order){
-                        <li class="list-group-item">
-                            @food.Name with @food.Price Euros
-                        </li>
+                 @functions{
+                    void RenderItem(OrderViewModel.OrderItem item)
+                    {
+                           <li class="list-group-item">
+                                @item.Name - @item.Price Euros
+                                @if(item.ReceivedAt != null)
+                                {
+                                    <small class="text-success">
+                                        Received at @item.ReceivedAt.DeliveredOn (Delivery-ID @item.ReceivedAt.DeliveryId) 
+                                    </small>
+                                }
+                            </li>
+                        }
+                 }
+                    @foreach(var food in order.FoodOrder) {
+                        RenderItem(food);
+                    }
+
+                    @foreach(var drink in order.DrinkOrder){
+                       RenderItem(drink);
                     }
                 </ul>
             
