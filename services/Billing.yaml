@@ -2,16 +2,16 @@ openapi: 3.0.3
 info:
   title: Billing
   description: |
-      Keeps track of ordered items from guests to create bills for them and offers the guest a possibility to pay their bills with different payment methods
+      Keeps track of ordered items in the restaurant and offers guests a possibility to pay their bills with different payment methods.
   version: 1.0.0
 paths:
   /bills/{guest}:
-    get:
-      summary: Generates the bill for a guest
+    post:
+      summary: Generates the bill for a guest with all open orders
       description: |
         Returns the ordered items of the customer together with a total sum
       responses:
-        "200":
+        "201":
           description: Bill generated successfully
           content:
             application/json:
@@ -19,7 +19,7 @@ paths:
                 $ref: "#/components/schemas/bill"
               examples:
                 SingleOrder:
-                  summary: A bill containing a single order
+                  summary: A bill containing all items from orders of the guest
                   value:
                     {
                         "bill": 1,
@@ -28,6 +28,30 @@ paths:
                         ],
                         "totalSum": 65.8
                     }
+        "202":
+          description: Bill was already generated previously and is updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/bill"
+              examples:
+                SingleOrder:
+                  summary: A bill containing all items from orders of the guest
+                  value:
+                    {
+                        "bill": 1,
+                        "orderedItems": [
+                            1
+                        ],
+                        "totalSum": 65.8
+                    }
+        "404":
+          description: Guest is unknown
+          content:
+            text/html:
+              schema:
+                $ref: "#/components/schemas/errorMessage"
+              example: The guest is unknown
   /payment/{bill}:
     get:
       summary: Returns the payment options for this bill
@@ -74,23 +98,23 @@ paths:
           description: The payment method was not accepted and a supported one should be chosen
           content:
             text/html:
-                schema:
-                  $ref: "#/components/schemas/errorMessage"
-                example: Please use a supported payment method for this bill
+              schema:
+                $ref: "#/components/schemas/errorMessage"
+              example: Please use a supported payment method for this bill
         "416":
-          description: The transfered amount was not sufficient
+          description: The transferred amount was not sufficient
           content:
             text/html:
-                schema:
-                  $ref: "#/components/schemas/errorMessage"
-                example: Please pay at least 123.45 euros for this bill
+              schema:
+                $ref: "#/components/schemas/errorMessage"
+              example: Please pay at least 123.45 euros for this bill
         "410":
           description: The bill is not open and was either payed or cancelled
           content:
             text/html:
-                schema:
-                  $ref: "#/components/schemas/errorMessage"
-                example: No payment for the bill required
+              schema:
+                $ref: "#/components/schemas/errorMessage"
+              example: No payment for the bill required
 
 components:
   parameters:
@@ -128,7 +152,7 @@ components:
       example: 10.0
     paymentMethod:
       type: string
-      description: Available payment method in the restauraunt
+      description: Available payment method in the restaurant
       enum: ["Cash", "DebitCard", "CreditCard"]
       example: "Cash"
     bill:

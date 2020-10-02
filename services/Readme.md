@@ -1,8 +1,8 @@
-# View documentation
+# Work with service specifications
 
 Services are documented with the [Open API Specification](https://www.openapis.org/) in the YAML-format.
 
-Note: commands are expected to be executed from the `services` directory!
+Note: the folling commands in the documentation are expected to be executed from the `services` directory!
 
 ## Viewing a single service documentation
 
@@ -38,6 +38,9 @@ To view all service documentation in one document use the following command
 
 ## Building service proxies from the OpenAPI files
 
+Note: you don't need to generate service proxies in order to use `OpenApi` specifications!
+You can always hand-roll your own objects/types and us them within your project.
+
 Service proxies for clients can be generated with the help of the <https://github.com/OpenAPITools/openapi-generator> tool.
 The tool can be installed or executed via the following `docker` command:
 
@@ -69,4 +72,4 @@ The generated files in the `generated/<<foldername>>` folder can then be used to
         --spec /services/GuestExperience.yaml
 
 The fake server is reachable via <http://localhost:8010/>.
-To use provided examples of the OpenAPI file use `--use-example` as additional parameter
+If you want to use the provided examples of an OpenAPI file append `--use-example` as additional parameter.
