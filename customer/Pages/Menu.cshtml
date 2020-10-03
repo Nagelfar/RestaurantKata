@@ -61,7 +61,7 @@
                         <tr>
                             <td>@drinkItem.Name</td>
                             <td>@String.Join(", ",drinkItem.Nutrition)</td>
-                            <td>@drinkItem.Price</td>
+                            <td>@drinkItem.Price €</td>
                             <td>
                                 <input type="hidden" asp-for="Order.Drinks[i].Id" value="@drinkItem.Id" />
                                 <input type="number" asp-for="Order.Drinks[i].Quantity" class="form-control"/>

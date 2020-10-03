@@ -7,21 +7,41 @@
 <div class="d-flex justify-content-between mb-2">
     <p class="lead">Guest <b>ID @Model.Guest</b> with @Model.Orders.Count() order(s) </p>
 
-    <div class="btn-group">
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#order-menu" data-remote="@Url.Page("../Menu",new {guest = Model.Guest})">
-            + Place new order
-        </button>
-        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#order-menu" data-remote="@Url.Page("../Menu",new {guest = Model.Guest})">
-            Pay all orders
-        </button>
+    <div class="btn-toolbar">
+        <div class="btn-group mr-2" role="group">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#order-menu" data-remote="@Url.Page("../Menu",new {guest = Model.Guest})">
+                + Place new order
+            </button>
+        </div>
+        <div class="btn-group" role="group">
+            @if(Model.Bill != null)
+            {    
+                <form method="POST">
+                    <input class="btn btn-secondary h-100" type="submit" asp-route-guest="@Model.Guest" asp-page-handler="RequestBill" value="Request an updated bill" />
+                </form>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#order-menu" data-remote="@Url.Page("../Menu",new {guest = Model.Guest})">
+                    Pay all orders
+                </button>
+            } else {
+                <form method="POST">
+                    <input class="btn btn-primary h-100" type="submit" asp-page-handler="RequestBill" asp-route-guest="@Model.Guest" value="Request bill" />
+                </form>
+            }
+        </div>
     </div>
 </div>
 
 <partial name="_Orders" for="@Model.Orders" />
 
+@if(Model.Bill != null)
+{
+    <p>
+        Bill for @Model.Bill.BilledItems items from @Model.Bill.BillFrom.ToShortTimeString(): <b>@Model.Bill.TotalSum €</b> 
+    </p>
+}
+
 <div class="modal" tabindex="-1" id="order-menu" data->
   <div class="modal-dialog modal-xl">
-    
   </div>
 </div>
 

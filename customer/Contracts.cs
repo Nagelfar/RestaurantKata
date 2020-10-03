@@ -29,7 +29,7 @@ namespace Customer
             public decimal Price { get; set; }
         }
 
-        public int Guest {get;set;}
+        public int Guest { get; set; }
         public OrderConfirmation Confirmation { get; set; }
         public List<OrderItem> FoodOrder { get; set; }
         public List<OrderItem> DrinkOrder { get; set; }
@@ -49,5 +49,23 @@ namespace Customer
         public int Order { get; }
         public DeliveredItems Items { get; }
         public int Delivery { get; }
+    }
+
+    public class BillReceived : Event
+    {
+        public BillReceived(int guest, int bill, List<int> orderedFood, List<int> orderedDrinks, decimal totalSum)
+        {
+            Guest = guest;
+            Bill = bill;
+            OrderedFood = orderedFood;
+            OrderedDrinks = orderedDrinks;
+            TotalSum = totalSum;
+        }
+
+        public int Guest { get; }
+        public int Bill { get; }
+        public List<int> OrderedFood { get; }
+        public List<int> OrderedDrinks { get; }
+        public decimal TotalSum { get; }
     }
 }

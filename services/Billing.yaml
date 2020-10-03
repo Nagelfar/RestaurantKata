@@ -2,16 +2,24 @@ openapi: 3.0.3
 info:
   title: Billing
   description: |
-      Keeps track of ordered items in the restaurant and offers guests a possibility to pay their bills with different payment methods.
+    Keeps track of ordered items in the restaurant and offers a guest a possibility to pay their bills with different payment methods.
   version: 1.0.0
 paths:
   /bills/{guest}:
     post:
+      parameters:
+        - name: guest
+          description: Identifier of a guest in the restaurant
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/identifier"
       summary: Generates the bill for a guest with all open orders
+      operationId: generate-bill
       description: |
         Returns the ordered items of the customer together with a total sum
       responses:
-        "201":
+        "200":
           description: Bill generated successfully
           content:
             application/json:
@@ -53,6 +61,13 @@ paths:
                 $ref: "#/components/schemas/errorMessage"
               example: The guest is unknown
   /payment/{bill}:
+    parameters:
+      - name: bill
+        description: Identifier of a bill
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/identifier"
     get:
       summary: Returns the payment options for this bill
       description: |
@@ -117,21 +132,6 @@ paths:
               example: No payment for the bill required
 
 components:
-  parameters:
-    guestParam:
-      description: Identifier of a guest in the restaurant
-      name: guest
-      in: path
-      required: true
-      schema:
-        $ref: "#/components/schemas/identifier"
-    billParam:
-      description: Identifier of a bill
-      name: bill
-      in: path
-      required: true
-      schema:
-        $ref: "#/components/schemas/identifier"
   schemas:
     errorMessage:
       type: string
@@ -160,11 +160,14 @@ components:
       properties:
         bill:
           $ref: "#/components/schemas/identifier"
-        orderedItems:
+        orderedDrinks:
           type: array
-          minimum: 1
           items:
-            $ref: "#/components/schemas/identifiers"
+            $ref: "#/components/schemas/identifier"
+        orderedFood:
+          type: array
+          items:
+            $ref: "#/components/schemas/identifier"
         totalSum:
           description: Contains the total amount of ordered items
           $ref: "#/components/schemas/money"
