@@ -1,13 +1,19 @@
 ﻿@page
 @model MenuModel
 @{
-    ViewData["Title"] = "Home page";
+    Layout = null;
 }
-<form method="POST" class="card">
-    <div class="card-header">
-        Hi guest <b>@Model.Menu.Guest</b>, we are ready to take your order!
+
+<form method="POST" class="modal-content">
+    <div class="modal-header">
+        <h5 class="modal-title">
+            Hi guest <b>@Model.Menu.Guest</b>, we are ready to take your order!
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
     </div>
-    <div class="card-body container">
+    <div class="modal-body container">
         <div class="row">
             <div class="col-6">
                 <table class="table table-responsive">
@@ -67,8 +73,9 @@
             </div>
         </div>
     </div>
-    <div class="card-footer">
+    <div class="modal-footer">
         <input type="hidden" asp-for="Order.Guest"/>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         <input class="btn btn-primary" type="submit" asp-page-handler="Order" value="Order selected items"/>
     </div>
 </form>

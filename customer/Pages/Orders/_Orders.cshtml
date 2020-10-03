@@ -1,0 +1,69 @@
+@model IEnumerable<OrderViewModel>
+
+<div class="row row-cols-1 row-cols-md-2">
+    @foreach (var order in Model)
+    {
+        <div class="col mb-2">
+            <div class="card">
+                <div class="card-header">
+                    <h5>
+                        Order #<b>@order.Confirmation.Order</b> from @order.OrderTime.ToLongTimeString()
+                        <br/>
+                        <small class="text-muted">
+                            waiting time: ~@TimeSpan.FromSeconds(order.Confirmation.WaitingTime).ToString("mm\\:ss") minute(s)
+                        </small>
+                    </h5>
+                    @if(order.OrderDuration.HasValue)
+                    {
+                        <small class="text-success">Completed after @order.OrderDuration.Value.ToString("mm\\:ss") minute(s)</small>
+                    }
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Price</th>
+                                <th>Delivered (ID@@Time)</th>
+                            </tr>
+                        </thead>
+                        <tbody >
+                        @functions
+                        {
+                            void RenderItem(OrderViewModel.OrderItem item)
+                            {
+                                <tr>
+                                    <td>@item.Name</td>
+                                    <td>@item.Price €</td>
+                                    
+                                    @if(item.ReceivedAt != null)
+                                    {
+                                        <td class="table-success">
+                                            <small >
+                                                ID @item.ReceivedAt.DeliveryId @@ @item.ReceivedAt.DeliveredOn.ToLongTimeString()
+                                            </small>
+                                        </td>
+                                    } else {
+                                        <td></td>
+                                    }
+                                    
+                                </tr>
+                            }
+                        }
+                        @foreach(var food in order.FoodOrder)
+                        {
+                            RenderItem(food);
+                        }
+
+                        @foreach(var drink in order.DrinkOrder)
+                        {
+                            RenderItem(drink);
+                        }
+                
+                        </tbody>
+                    </table>
+                </div>
+            </div>  
+        </div> 
+    }
+</div>  

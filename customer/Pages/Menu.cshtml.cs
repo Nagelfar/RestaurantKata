@@ -107,12 +107,12 @@ namespace Customer.Pages
             {
                 Guest = order.Guest,
                 FoodOrder = order.Food.Select(f => menu.Food.Select(Convert).Single(x => x.Id == f)).ToList(),
-                DrinkOrder = order.Drinks.Select(d => menu.Drinks.Select(Convert).Single(x => x.Id == d)).ToList(),
+                DrinkOrder = order.Drinks.Select(d => Menus[Order.Guest].Drinks.Select(Convert).Single(x => x.Id == d)).ToList(),
                 Confirmation = confirmation
             });
 
 
-            return RedirectToPage("/Orders", new { order = confirmation.Order });
+            return RedirectToPage("Orders/Detail", new { guest = order.Guest });
         }
     }
 }

@@ -5,20 +5,40 @@
 }
 @if(Model.Guests.Any())
 {    
-    <h5>Select a guest</h5>
-    <ol class="list-group mb-2">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Guest ID</th>
+                <th>Guest since</th>
+                <th># of different Orders</th>
+            </tr>
+        </thead>
+        <caption>Guests with open bills</caption>
+        <tbody>
     @foreach (var guest in Model.Guests)
     {
-        <li class="list-group-item">
-            <a asp-page="Menu" asp-route-guest="@guest.Guest">
-                Guest <b>@guest.Guest</b> entered at @guest.GuestSince and has @guest.Orders order(s)
-            </a>
-        </li>
+        <tr>
+            <th scope="row">@guest.Guest</th>
+            <td>@guest.GuestSince</td>
+            <td>
+                <a asp-page="Orders/Detail" asp-route-guest="@guest.Guest">
+                    @guest.Orders order(s)
+                </a>
+            </td>
+        </tr>
     }
-    </ol>
+    </tbody>
+    </table>
+    <div class="btn-toolbar">
+        <div class="mr-2">
+            <a class="btn btn-secondary" asp-page="Orders/Index">
+                All Orders
+            </a>
+    </div>
     <form method="POST">
         <input class="btn btn-secondary" type="submit" asp-page-handler="RetrieveMenu" value="Register as another guest" />
     </form>
+    </div>
 } else {
     <form method="POST">
         <input class="btn btn-primary" type="submit" asp-page-handler="RetrieveMenu" value="Register as first guest of the restaurant and receive the menu!" />

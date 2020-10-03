@@ -18,7 +18,20 @@ namespace Customer
 
         public TState Project<TState>(TState initial, Func<TState, Event, TState> projector)
         {
-            return _events.ToList().Aggregate(initial, projector);
+            return _events.ToList().Project(initial, projector);
+        }
+        public IReadOnlyCollection<Event> IncludeOnly(Func<Event, bool> predicate) => 
+            _events
+                .ToList()
+                .Where(predicate)
+                .ToList();
+    }
+
+    public static class ProjectionExtensions
+    {
+        public static TState Project<TState>(this IReadOnlyCollection<Event> messages, TState initial, Func<TState, Event, TState> projector)
+        {
+            return messages.Aggregate(initial, projector);
         }
     }
 }

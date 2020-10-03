@@ -1,0 +1,16 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+<div class="list-group">
+    @foreach(var guest in Model.Orders)
+    {
+        <div class="list-group-item">
+            <p class="lead">
+                Guest <b>@guest.Guest</b> with @guest.Orders.Count() orders
+            </p>
+            <partial name="_Orders" for="@guest.Orders">
+        </div>
+    }
+</div>

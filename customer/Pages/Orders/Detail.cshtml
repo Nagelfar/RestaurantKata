@@ -1,0 +1,36 @@
+﻿@page
+@model DetailModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="d-flex justify-content-between mb-2">
+    <p class="lead">Guest <b>ID @Model.Guest</b> with @Model.Orders.Count() order(s) </p>
+
+    <div class="btn-group">
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#order-menu" data-remote="@Url.Page("../Menu",new {guest = Model.Guest})">
+            + Place new order
+        </button>
+        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#order-menu" data-remote="@Url.Page("../Menu",new {guest = Model.Guest})">
+            Pay all orders
+        </button>
+    </div>
+</div>
+
+<partial name="_Orders" for="@Model.Orders" />
+
+<div class="modal" tabindex="-1" id="order-menu" data->
+  <div class="modal-dialog modal-xl">
+    
+  </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function(){
+            $('#order-menu').on('show.bs.modal', event =>{
+                $($(event.relatedTarget).data('target') + ' .modal-dialog').load($(event.relatedTarget).data("remote"));
+            });
+        })
+    </script>
+}
