@@ -3,75 +3,72 @@
 @{
     ViewData["Title"] = "Home page";
 }
-@if(Model.Menu != null)
-{
-    <form method="POST" class="card">
-        <div class="card-header">
-            Hi guest <b>@Model.Menu.Guest</b>, we are ready to take your order!
-        </div>
-        <div class="card-body container">
-            <div class="row">
-                <div class="col-6">
-                    <table class="table table-responsive">
-                        <caption>List of served food</caption>
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Nutrition</th>
-                                <th>Price</th>
-                                <th>Quantity</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        @for (var i = 0; i < Model.Menu.Food.Count; i++)
-                        {
-                            var foodItem = Model.Menu.Food[i];
-                            <tr>
-                                <td>@foodItem.Name</td>
-                                <td>@String.Join(", ",foodItem.Nutrition)</td>
-                                <td>@foodItem.Price</td>
-                                <td>
-                                    <input type="hidden" asp-for="Order.Food[i].Id" value="@foodItem.Id" />
-                                    <input type="number" asp-for="Order.Food[i].Quantity" class="form-control" min="0" />
-                                </td>
-                            </tr>
-                        }
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-6">
-                    <table class="table table-responsive">
-                        <caption>List of drinks</caption>
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Nutrition</th>
-                                <th>Price</th>
-                                <th>Quantity</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        @for (var i = 0; i < Model.Menu.Drinks.Count; i++)
-                        {
-                            var drinkItem = Model.Menu.Drinks[i];
-                            <tr>
-                                <td>@drinkItem.Name</td>
-                                <td>@String.Join(", ",drinkItem.Nutrition)</td>
-                                <td>@drinkItem.Price</td>
-                                <td>
-                                    <input type="hidden" asp-for="Order.Drinks[i].Id" value="@drinkItem.Id" />
-                                    <input type="number" asp-for="Order.Drinks[i].Quantity" class="form-control"/>
-                                </td>
-                            </tr>
-                        }
-                        </tbody>
-                    </table>
-                </div>
+<form method="POST" class="card">
+    <div class="card-header">
+        Hi guest <b>@Model.Menu.Guest</b>, we are ready to take your order!
+    </div>
+    <div class="card-body container">
+        <div class="row">
+            <div class="col-6">
+                <table class="table table-responsive">
+                    <caption>List of served food</caption>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Nutrition</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @for (var i = 0; i < Model.Menu.Food.Count; i++)
+                    {
+                        var foodItem = Model.Menu.Food[i];
+                        <tr>
+                            <td>@foodItem.Name</td>
+                            <td>@String.Join(", ",foodItem.Nutrition)</td>
+                            <td>@foodItem.Price</td>
+                            <td>
+                                <input type="hidden" asp-for="Order.Food[i].Id" value="@foodItem.Id" />
+                                <input type="number" asp-for="Order.Food[i].Quantity" class="form-control" min="0" />
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-6">
+                <table class="table table-responsive">
+                    <caption>List of drinks</caption>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Nutrition</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @for (var i = 0; i < Model.Menu.Drinks.Count; i++)
+                    {
+                        var drinkItem = Model.Menu.Drinks[i];
+                        <tr>
+                            <td>@drinkItem.Name</td>
+                            <td>@String.Join(", ",drinkItem.Nutrition)</td>
+                            <td>@drinkItem.Price</td>
+                            <td>
+                                <input type="hidden" asp-for="Order.Drinks[i].Id" value="@drinkItem.Id" />
+                                <input type="number" asp-for="Order.Drinks[i].Quantity" class="form-control"/>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
             </div>
         </div>
-        <div class="card-footer">
-            <input type="hidden" asp-for="Order.Guest"/>
-            <input class="btn btn-primary" type="submit" asp-page-handler="Order" value="Order selected items"/>
-        </div>
-    </form>
-}
+    </div>
+    <div class="card-footer">
+        <input type="hidden" asp-for="Order.Guest"/>
+        <input class="btn btn-primary" type="submit" asp-page-handler="Order" value="Order selected items"/>
+    </div>
+</form>

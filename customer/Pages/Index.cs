@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Http;
 using Api.TableService.Model;
+using System.Collections.Immutable;
 
 namespace Customer.Pages
 {
@@ -20,7 +21,20 @@ namespace Customer.Pages
         private readonly HttpClient _guestExperienceClient;
         private readonly EventStore _events;
 
-        public bool RetrievedMenu { get; }
+        public class GuestViewModel
+        {
+            public int Guest { get; internal set; }
+            public DateTime GuestSince { get; internal set; }
+            public int Orders { get; internal set; }
+
+            public GuestViewModel AddOrder() {
+                Orders++;
+                return this;
+            }
+        }
+
+        private readonly ImmutableDictionary<int,GuestViewModel> _guests;
+        public IEnumerable<GuestViewModel> Guests { get => _guests.Values; }
 
         public IndexModel(ILogger<MenuModel> logger, IHttpClientFactory factory, EventStore events)
         {
@@ -28,13 +42,27 @@ namespace Customer.Pages
             _guestExperienceClient = factory.CreateClient("GuestExperience");
             _events = events;
 
-            RetrievedMenu = _events.Project(false, (state, @event) => @event switch
-            {
-                MenuRetrieved _ => true,
-                _ => state
-            });
+            _guests = _events.Project(
+                ImmutableDictionary<int,GuestViewModel>.Empty,
+                (state, @event) => @event switch
+                {
+                    MenuRetrieved menu => state.Add(
+                        menu.Menu.Guest,
+                        new GuestViewModel
+                        {
+                            Guest = menu.Menu.Guest,
+                            GuestSince = menu.On,
+                            Orders = 0
+                        }
+                    ),
+                    OrderPlaced order => state.SetItem(
+                        order.Guest,
+                        state.GetValueOrDefault(order.Guest).AddOrder()
+                    ),
+                    _ => state
+                });
         }
-        
+
         public async Task<IActionResult> OnPostRetrieveMenuAsync()
         {
             if (!ModelState.IsValid)
@@ -46,7 +74,7 @@ namespace Customer.Pages
 
             _events.Append(new MenuRetrieved { Menu = menu });
 
-            return RedirectToPage("/Menu");
+            return RedirectToPage("/Menu",new { guest = menu.Guest});
         }
 
     }

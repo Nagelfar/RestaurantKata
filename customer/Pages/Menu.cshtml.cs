@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Http;
 using Api.TableService.Model;
+using System.Collections.Immutable;
 
 namespace Customer.Pages
 {
@@ -38,22 +39,27 @@ namespace Customer.Pages
             _tableServiceClient = factory.CreateClient("TableService");
             _events = events;
 
-            Menu = _events.Project(default(Menu), (state, @event) => @event switch
-            {
-                MenuRetrieved menu => menu.Menu,
-                _ => state
-            });
+            Menus = _events.Project(
+                ImmutableDictionary<int, Menu>.Empty,
+                (state, @event) => @event switch
+                {
+                    MenuRetrieved menu => state.Add(menu.Menu.Guest, menu.Menu),
+                    _ => state
+                });
         }
 
-        public Menu Menu { get; set; }
+        private IReadOnlyDictionary<int, Menu> Menus { get; set; }
+        public Menu Menu { get; private set; }
 
         [BindProperty]
         public OrderCommand Order { get; set; }
 
-        public void OnGet()
+        public void OnGet(int guest)
         {
-            if(Menu == null)
+            if (!Menus.ContainsKey(guest))
                 RedirectToAction("/Index");
+
+            Menu = Menus[guest];
 
             Order = new OrderCommand { Guest = Menu.Guest };
         }
@@ -95,11 +101,13 @@ namespace Customer.Pages
 
             var confirmation = await response.Content.ReadContentAsJson<OrderConfirmation>();
 
+            var menu = Menus[Order.Guest];
+
             _events.Append(new OrderPlaced
             {
                 Guest = order.Guest,
-                FoodOrder = order.Food.Select(f => Menu.Food.Select(Convert).Single(x => x.Id == f)).ToList(),
-                DrinkOrder= order.Drinks.Select(d => Menu.Drinks.Select(Convert).Single(x => x.Id == d)).ToList(),
+                FoodOrder = order.Food.Select(f => menu.Food.Select(Convert).Single(x => x.Id == f)).ToList(),
+                DrinkOrder = order.Drinks.Select(d => menu.Drinks.Select(Convert).Single(x => x.Id == d)).ToList(),
                 Confirmation = confirmation
             });
 

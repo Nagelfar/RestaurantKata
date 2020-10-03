@@ -7,7 +7,7 @@ info:
 paths:
   /menu:
     get:
-      summary: Request daily menu
+      summary: Registers as guest and request the daily menu
       description: |
         Returns a guest identifier together with a menu structure containing the menu items together with nutrition and price information.
       operationId: get-menu

@@ -3,16 +3,24 @@
 @{
     ViewData["Title"] = "Retrieve Menu";
 }
-@if(Model.RetrievedMenu)
+@if(Model.Guests.Any())
 {    
-    <p>
-        You already have <a asp-page="./Menu">a menu!</a>
-    </p>
+    <h5>Select a guest</h5>
+    <ol class="list-group mb-2">
+    @foreach (var guest in Model.Guests)
+    {
+        <li class="list-group-item">
+            <a asp-page="Menu" asp-route-guest="@guest.Guest">
+                Guest <b>@guest.Guest</b> entered at @guest.GuestSince and has @guest.Orders order(s)
+            </a>
+        </li>
+    }
+    </ol>
     <form method="POST">
-            <input class="btn btn-secondary" type="submit" asp-page-handler="RetrieveMenu" value="Retrieve a new version of the Menu" />
+        <input class="btn btn-secondary" type="submit" asp-page-handler="RetrieveMenu" value="Register as another guest" />
     </form>
 } else {
     <form method="POST">
-        <input class="btn btn-primary" type="submit" asp-page-handler="RetrieveMenu" value="Retrieve the Restaurants Menu" />
+        <input class="btn btn-primary" type="submit" asp-page-handler="RetrieveMenu" value="Register as first guest of the restaurant and receive the menu!" />
     </form>
 }

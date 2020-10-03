@@ -14,18 +14,21 @@ using System.Collections.Immutable;
 
 namespace Customer.Pages
 {
+    using GuestOrders = ImmutableDictionary<int, ImmutableDictionary<int, OrderViewModel>>;
 
     public class OrderViewModel
     {
-        public OrderViewModel(int guest, List<OrderItem> foodOrder, List<OrderItem> drinkOrder, OrderConfirmation confirmation)
+        public OrderViewModel(int guest, DateTime orderTime, List<OrderItem> foodOrder, List<OrderItem> drinkOrder, OrderConfirmation confirmation)
         {
             Guest = guest;
+            OrderTime = orderTime;
             FoodOrder = foodOrder;
             DrinkOrder = drinkOrder;
             Confirmation = confirmation;
         }
 
         public int Guest { get; }
+        public DateTime OrderTime { get; }
         public List<OrderItem> FoodOrder { get; }
         public List<OrderItem> DrinkOrder { get; }
         public OrderConfirmation Confirmation { get; }
@@ -87,7 +90,7 @@ namespace Customer.Pages
     {
         private readonly ILogger<MenuModel> _logger;
         private readonly EventStore _events;
-        private readonly ImmutableDictionary<int, OrderViewModel> _orders;
+        private readonly GuestOrders _guests;
 
         private static void MarkUndeliveredItem(IEnumerable<OrderViewModel.OrderItem> items, IEnumerable<int> deliveryItems, OrderViewModel.OrderItem.Delivery delivery)
         {
@@ -118,23 +121,37 @@ namespace Customer.Pages
             return state;
         }
 
+        private static GuestOrders AppendOrder(GuestOrders state, OrderPlaced order)
+        {
+            var orders = state
+                .GetValueOrDefault(order.Guest, ImmutableDictionary<int, OrderViewModel>.Empty)
+                .Add(
+                    order.Confirmation.Order,
+                    new OrderViewModel(
+                        order.Guest,
+                        order.On,
+                        order.FoodOrder.Select(OrderViewModel.OrderItem.Create).ToList(),
+                        order.DrinkOrder.Select(OrderViewModel.OrderItem.Create).ToList(),
+                        order.Confirmation
+                    )
+                );
+
+            return state.SetItem(order.Guest, orders);
+        }
+
         public OrdersModel(ILogger<MenuModel> logger, IHttpClientFactory factory, EventStore events)
         {
             _logger = logger;
             _events = events;
 
-            _orders = _events.Project(ImmutableDictionary<int, OrderViewModel>.Empty, (state, @event) => @event switch
+            _guests = _events.Project(GuestOrders.Empty, (state, @event) => @event switch
              {
-                 OrderPlaced order => state.Add(
-                      order.Confirmation.Order,
-                      new OrderViewModel(
-                          order.Guest,
-                          order.FoodOrder.Select(OrderViewModel.OrderItem.Create).ToList(),
-                          order.DrinkOrder.Select(OrderViewModel.OrderItem.Create).ToList(),
-                          order.Confirmation
-                        )
-                      ),
-                 DeliveryReceived delivery => MarkAsDelivered(state, delivery),
+                 OrderPlaced order => AppendOrder(state, order),
+                 DeliveryReceived delivery =>
+                    state.SetItem(
+                        delivery.Guest,
+                        MarkAsDelivered(state.GetValueOrDefault(delivery.Guest), delivery)
+                    ),
                  _ => state
              });
         }
@@ -144,7 +161,10 @@ namespace Customer.Pages
 
         }
 
-        public IEnumerable<OrderViewModel> Orders { get => _orders.Values; }
+        public IEnumerable<(int Guest, IEnumerable<OrderViewModel> Orders)> Orders
+        {
+            get => _guests.Select(x => (x.Key, x.Value.Values)).ToList();
+        }
 
     }
 
