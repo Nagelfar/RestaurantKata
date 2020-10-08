@@ -16,31 +16,39 @@
         <div class="btn-group" role="group">
             @if(Model.Bill != null)
             {    
-                <form method="POST">
-                    <input class="btn btn-secondary h-100" type="submit" asp-route-guest="@Model.Guest" asp-page-handler="RequestBill" value="Request an updated bill" />
-                </form>
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#order-menu" data-remote="@Url.Page("../Menu",new {guest = Model.Guest})">
-                    Pay all orders
-                </button>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <form method="POST" class="btn btn-outline-secondary">
+                            <input class="btn" type="submit" asp-route-guest="@Model.Guest" asp-page-handler="RequestBill" value="Request an updated bill" />
+                        </form>
+                    </div>
+                    <span class="input-group-text">
+                        Bill from @Model.Bill.BillFrom.ToShortTimeString(): @Model.Bill.BilledItems items&nbsp;<b>@Model.Bill.TotalSum €</b>
+                    </span>
+                    <div class="input-group-append">
+                        <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#pay-bill" data-remote="@Url.Page("../Billing/Payment",new {guest = Model.Guest})">
+                            Pay all orders
+                        </button>
+                    </div>
+                </div>
             } else {
-                <form method="POST">
-                    <input class="btn btn-primary h-100" type="submit" asp-page-handler="RequestBill" asp-route-guest="@Model.Guest" value="Request bill" />
+                <form method="POST" class="btn btn-outline-secondary h-100">
+                    <input class="btn" type="submit" asp-page-handler="RequestBill" asp-route-guest="@Model.Guest" value="Request bill" />
                 </form>
             }
         </div>
     </div>
 </div>
 
+<vc:bills guest="@Model.Guest"></vc:bills>
 <partial name="_Orders" for="@Model.Orders" />
 
-@if(Model.Bill != null)
-{
-    <p>
-        Bill for @Model.Bill.BilledItems items from @Model.Bill.BillFrom.ToShortTimeString(): <b>@Model.Bill.TotalSum €</b> 
-    </p>
-}
-
 <div class="modal" tabindex="-1" id="order-menu" data->
+  <div class="modal-dialog modal-xl">
+  </div>
+</div>
+
+<div class="modal" tabindex="-1" id="pay-bill" data->
   <div class="modal-dialog modal-xl">
   </div>
 </div>
@@ -49,6 +57,9 @@
     <script>
         $(function(){
             $('#order-menu').on('show.bs.modal', event =>{
+                $($(event.relatedTarget).data('target') + ' .modal-dialog').load($(event.relatedTarget).data("remote"));
+            });
+            $('#pay-bill').on('show.bs.modal', event =>{
                 $($(event.relatedTarget).data('target') + ' .modal-dialog').load($(event.relatedTarget).data("remote"));
             });
         })

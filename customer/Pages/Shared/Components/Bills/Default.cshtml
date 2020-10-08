@@ -1,0 +1,37 @@
+﻿@model IReadOnlyCollection<Customer.Pages.Billing.BillViewModel>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Bill</th>
+            <th>Bill From</th>
+            <th>Items</th>
+            <th>Sum</th>
+            <th>Paid Amount</th>
+            <th>Paid On</th>
+            <th>Included orders</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach(var bill in this.Model){
+        <tr>
+            <td>@bill.Bill</td>
+            <td>@bill.BillFrom</td>
+            <td>@bill.BilledItems</td>
+            <td>@bill.TotalSum €</td>
+            <td>
+                @if(bill.PaidAmount.HasValue){
+                    @bill.PaidAmount.Value
+                }
+            </td>
+            <td>
+                @if(bill.PaidOn.HasValue){
+                    @bill.PaidOn.Value
+                }
+            </td>
+            <td>
+                @String.Join(", ", (bill.PaidOrders?? Enumerable.Empty<Api.Billing.Model.PaidOrder>()).Select(x=>x.Order))
+            </td>
+        </tr>
+    }
+</tbody>
+</table>

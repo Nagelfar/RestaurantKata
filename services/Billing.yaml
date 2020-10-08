@@ -14,13 +14,14 @@ paths:
           required: true
           schema:
             $ref: "#/components/schemas/identifier"
-      summary: Generates the bill for a guest with all open orders
+      summary: Generates the bill for a guest with all unpaid but delivered items
       operationId: generate-bill
       description: |
-        Returns the ordered items of the customer together with a total sum
+        Returns the delivered items of the customer together with a total sum as part of the bill.
+        Note: bill and orders don't need to fully match, e.g. you can have 3 orders with different food and drink items paid by two separate bills.
       responses:
         "200":
-          description: Bill generated successfully
+          description: A new bill was generated successfully
           content:
             application/json:
               schema:
@@ -31,13 +32,16 @@ paths:
                   value:
                     {
                         "bill": 1,
-                        "orderedItems": [
+                        "orderedFood": [
                             1
+                        ],
+                        "orderedDrinks": [
+                            2
                         ],
                         "totalSum": 65.8
                     }
         "202":
-          description: Bill was already generated previously and is updated
+          description: A bill was open and it was updated
           content:
             application/json:
               schema:
@@ -48,8 +52,11 @@ paths:
                   value:
                     {
                         "bill": 1,
-                        "orderedItems": [
+                        "orderedFood": [
                             1
+                        ],
+                        "orderedDrinks": [
+                            2
                         ],
                         "totalSum": 65.8
                     }
@@ -91,7 +98,7 @@ paths:
     post:
       summary: Pays the bill
       description: |
-        Marks the bill as payed
+        Marks the bill as paid
       requestBody:
         required: true
         content:
@@ -109,6 +116,25 @@ paths:
       responses:
         "202":
           description: Payment was accepted for this bill
+          content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/paidBill"
+                examples:
+                  PaidTwoBills:
+                    summary: Two orders have been paid by this bill
+                    value:
+                      {
+                        "bill": 1,
+                        "paidOrders": [
+                          { 
+                            "order": 1,
+                            "paidFood": [1],
+                            "paidDrinks": []
+                          }
+                        ],
+                        "totalSum": 65.8
+                    }
         "406":
           description: The payment method was not accepted and a supported one should be chosen
           content:
@@ -124,7 +150,7 @@ paths:
                 $ref: "#/components/schemas/errorMessage"
               example: Please pay at least 123.45 euros for this bill
         "410":
-          description: The bill is not open and was either payed or cancelled
+          description: The bill is not open and was either paid or cancelled
           content:
             text/html:
               schema:
@@ -155,6 +181,20 @@ components:
       description: Available payment method in the restaurant
       enum: ["Cash", "DebitCard", "CreditCard"]
       example: "Cash"
+    paidOrder:
+      description: Contains items of an order that have been paid
+      type: object
+      properties:
+        order:
+          $ref: "#/components/schemas/identifier"
+        paidDrinks:
+          type: array
+          items:
+            $ref: "#/components/schemas/identifier"
+        paidFood:
+          type: array
+          items:
+            $ref: "#/components/schemas/identifier"
     bill:
       type: object
       properties:
@@ -177,6 +217,17 @@ components:
       items:
         minimum: 1
         $ref: "#/components/schemas/paymentMethod"
+    paidBill:
+      type: object
+      properties:
+        bill:
+          $ref: "#/components/schemas/identifier"
+        paidOrders:
+          description: Lists the orders and items that have been paid by this bill
+          type: array  
+          items:
+            minimum: 1
+            $ref: "#/components/schemas/paidOrder"
     billPayment:
       type: object
       properties:

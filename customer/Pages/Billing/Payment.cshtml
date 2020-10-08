@@ -1,0 +1,35 @@
+﻿@page
+@model PaymentModel
+@{
+    Layout = null;
+}
+<form method="POST" class="modal-content" asp-page="Payment">
+    <div class="modal-header">
+        <h5 class="modal-title">
+            Payment for bill @Model.Bill.Bill
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body container">
+        <p>
+            You are paying @Model.Bill.BilledItems items with the bill from @Model.Bill.BillFrom and a total of <b>@Model.Bill.TotalSum €</b>
+        </p>
+        <input type="hidden" asp-for="Command.Bill" />
+        <input type="hidden" asp-for="Command.Guest" />
+        <div class="form-group">
+            <label asp-for="Command.PaymentMethod">Please select an accepted payment method:</label>
+            <select class="form-control" asp-items="Model.SupportedPaymentMethods" asp-for="Command.PaymentMethod">
+            </select>
+        </div>
+        <div class="form-group">
+            <label asp-for="Command.Amount">Please enter your payment amount, including tips</label>
+            <input class="form-control" type="number" asp-for="Command.Amount" min="@Model.Bill.TotalSum" step="0.01" />
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <input class="btn btn-primary" type="submit" value="Pay"/>
+    </div>
+</form>

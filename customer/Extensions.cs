@@ -30,13 +30,4 @@ namespace Customer
             return JsonConvert.DeserializeObject<T>(stringContent);
         }
     }
-
-    public static class CollectionExtensions
-    {
-        public static List<T> AddToList<T>(this List<T> list, T item)
-        {
-            list.Add(item);
-            return list;
-        }
-    }
 }

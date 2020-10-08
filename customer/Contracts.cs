@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Api.Billing.Model;
 using Api.GuestExperience.Model;
 using Api.TableService.Model;
 
@@ -67,5 +68,53 @@ namespace Customer
         public List<int> OrderedFood { get; }
         public List<int> OrderedDrinks { get; }
         public decimal TotalSum { get; }
+    }
+
+    public class BillUpdated : Event
+    {
+        public BillUpdated(int guest, int bill, List<int> orderedFood, List<int> orderedDrinks, decimal totalSum)
+        {
+            Guest = guest;
+            Bill = bill;
+            OrderedFood = orderedFood;
+            OrderedDrinks = orderedDrinks;
+            TotalSum = totalSum;
+        }
+
+        public int Guest { get; }
+        public int Bill { get; }
+        public List<int> OrderedFood { get; }
+        public List<int> OrderedDrinks { get; }
+        public decimal TotalSum { get; }
+    }
+
+    public class PaymentMethodsSupported : Event
+    {
+        public PaymentMethodsSupported(int guest, int bill, PaymentMethod[] paymentMethods)
+        {
+            Guest = guest;
+            Bill = bill;
+            PaymentMethods = paymentMethods;
+        }
+
+        public int Guest { get; }
+        public int Bill { get; }
+        public PaymentMethod[] PaymentMethods { get; }
+    }
+
+    public class BillPaid : Event
+    {
+        public BillPaid(int guest, int bill, decimal amount, List<PaidOrder> paidOrders)
+        {
+            Guest = guest;
+            Bill = bill;
+            Amount = amount;
+            PaidOrders = paidOrders;
+        }
+
+        public int Guest { get; }
+        public int Bill { get; }
+        public decimal Amount { get; }
+        public List<PaidOrder> PaidOrders { get; }
     }
 }

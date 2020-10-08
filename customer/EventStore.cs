@@ -4,6 +4,8 @@ using System.Linq;
 
 namespace Customer
 {
+    public delegate TState Projector<TState>(TState state, Event @event);
+
     public class EventStore
     {
 
@@ -16,7 +18,7 @@ namespace Customer
             }
         }
 
-        public TState Project<TState>(TState initial, Func<TState, Event, TState> projector)
+        public TState Project<TState>(TState initial, Projector<TState> projector)
         {
             return _events.ToList().Project(initial, projector);
         }
@@ -29,9 +31,9 @@ namespace Customer
 
     public static class ProjectionExtensions
     {
-        public static TState Project<TState>(this IReadOnlyCollection<Event> messages, TState initial, Func<TState, Event, TState> projector)
+        public static TState Project<TState>(this IReadOnlyCollection<Event> messages, TState initial, Projector<TState> projector)
         {
-            return messages.Aggregate(initial, projector);
+            return messages.Aggregate(initial, projector.Invoke);
         }
     }
 }
