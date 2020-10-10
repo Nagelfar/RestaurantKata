@@ -82,20 +82,22 @@ The cashier keeps track of items a guest ordered, generates a bill and marks pay
 
 ## Part 1 - Building the system in a naive way
 
-The goal of the first exercise is to dive into the domain, learn about the actors and how they are connected.
-The focus is on bringing value to the guest, while learning about the rules and the behavior of the system we develop.
+The goal of the first exercise is to dive into the domain while you learn about the actors and how they are connected.
+Your focus should ly on bringing value to the guest, and not on building a perfect distributed system!
 
-We build each actor as a standalone application and connect them together to form a distributed system, with the existing customer application as representation of the user.
+We build each actor as a standalone application and connect them together to form a distributed system.
+The existing customer application will act as representation of the user and connect to your application.
 To keep things simple from a technical point of view, the following guidelines should be respected:
 
 - each actor is implemented as independent runnable application, and it can be started with a simple CLI command
-- configuration parameters of an application can be set/overridden via environment variables
+- configuration parameters of an application can be set or overridden via environment variables
 - all communication is done via unsecured HTTP and the exposed port can be configured via a dedicated environment variable (e.g. `PORT` or `ASPNETCORE_URLS`)
 - logs messages are written to the console / STDOUT
+- durable persistence is not needed, so storing data in memory while hard coding e.g. the menu or prices is sufficient.
 
 ### Starting points
 
-The guest is simulated and expects the following contracts to be implemented by the  following services:
+The guest is simulated by the [customer application](./customer) and communicates via the following contracts with your services:
 
 - The customer itself exposes some endpoints described [here](services/Customer.yaml), which can be called by other systems
 - [Guest experience](services/GuestExperience.yaml), [Table Service](services/TableService.yaml) and [Billing](services/Billing.yaml) define contracts that are called by the customer
@@ -112,54 +114,59 @@ So to summarize it again, the goals of the first part of the Kata are:
 - building a naive distributed system based on HTTP calls,
 - to create the basis for the following parts.
 
+At the end you should be able to connect the developed services to the customer frontend and you should have a similar experience as shown in the following video.
+
+![](https://youtu.be/PcRHigcAZ7E "Restaurant Kata demo")
+
 ## Part 2 - The fallacies of distributed computing
 
-The goal of the second exercise is to understand how the system reacts to stress and tension.
+The goal of the second exercise is to understand how the system reacts to stress and tension and failures.
 We will introduce artificial constraints, bugs and problems into your code to study the reaction of our system.
 Then we will introduce and apply patterns to improve our system and make it more robust.
 
 ### Constraints / Bugs / Problems
 
-Introducing constraints to actors will The following constraints should be implemented for the actors
-
-Make sure that all configuration values are exposed via an environment-variable!
-
+The following constraints should be implemented for the each actor and make sure that all configuration values are exposed via the mentioned environment-variable!
 
 #### Clumsy Delivery
 
-Every once in a while the assistant manager in delivery drops a prepared meal while serving it to the customer, and this happens after Billing was notified about the delivery!
+Every once in a while the assistant manager in `Delivery` drops a prepared meal.
+Usually this happens while serving the meal to the customer, after `Billing` was notified about the delivery!
 
-The idea behind this constraint is that every once in a while expected calls in a distributed system might fail, especially if multiple calls are involved at the same time.
+The idea behind this constraint is that every once in a while expected calls in a distributed system might fail, especially if multiple calls are involved as part of the same (logical) action.
 
-From an implementation point of view this means that notifications to the guest with the meal gets lost, but the call to delivery succeeds.
+From an implementation point of view this means that a notification to `Customer` with the meal gets lost, but the call to `Delivery` succeeds.
 There can be a configuration value, e.g. `CLUMSY_DELIVERY_RATIO`  set to `0.1` to drop 10% of the prepared meals.
 
 #### The overeager Cook
 
 The cook enjoys preparing food and sometimes too much is cooked for an ordered item.
-Not one piece should be wasted, so our cook simply places the same item two times on the counter for delivery to pick it up.
+Not one piece should be wasted, so our cook simply places the same item two times on the counter, which is then picked up by `Delivery`.
 
 Sometimes in distributed systems messages or calls get duplicated and the same content is presented several times to the consumer.
 
-There should be a configuration value `OVEREAGER_COOK_RATIO` set to e.g. `0.1` so that 10% of the meals are prepared two times.
-When a meal is prepared two times the same message is simply forwarded another time to delivery!
+There should be a configuration value `OVEREAGER_COOK_RATIO` in `Table experiecne` set to e.g. `0.1`, so that 10% of the meals are prepared two times.
+When a meal is prepared two times, the same message is simply forwarded another time from `Food Preparation` to `Delivery`!
 
 #### Slow Waiter
 
-The waiter likes to go for a smoke every once in a while, usually after taking orders from the customer and forwarding the meal items to the cook - so before telling delivery what to deliver to which guest.
+The waiter likes to go for a smoke every once in a while, usually after he took the order from the customer and he forwarded the meal items to the cook.
+So before he told `Delivery` what they need to deliver to which guest!
 
 In distributed systems sometimes requests or messages to a service are way slower than you expect, but they still succeed.
 
-Calls to delivery from the waiter get delayed for a certain amount of time, but requests to the cook happen right away.
-With a configuration value of `SLOW_WAITER` set to e.g. `0.1` 10% of the requests to delivery start at a later point in time. `SLOW_WAITER_DELAY` set to e.g. `60` means that an artificial delay of 60 seconds is added to that request.
+Calls to `Delivery` from the `Guest Experience` get delayed for a certain amount of time, but requests to the cook happen right away.
+With a configuration value of `SLOW_WAITER` set to e.g. `0.1` 10% of the requests to delivery start at a later point in time.
+`SLOW_WAITER_DELAY` set to e.g. `60` means that an artificial delay of 60 seconds is added to that request.
 
 #### Busy Cashier
 
-Because the cashier is always busy in keeping track of the bills and collecting and counting money, from time to time notifications for delivered items are not recognized.
+The cashier is always busy in keeping track of the bills while he is collecting and counting money.
+From time to time notifications for delivered items are not recognized by her.
 
-When services are called from a consumer they are sometimes down, have bugs and response with an error or sometimes they simply do not request at all.
+When services are called from a consumer they are sometimes down, have bugs, response with an error or sometimes they simply do not reply at all.
 
-`BUSY_CASHIER` set so `0.1` indicates that for 10% of the calls, to mark an item delivered to the customer fail with an HTTP 500 error.
+`BUSY_CASHIER` set so `0.1` indicates that 10% of the calls from `Delivery` to `Billing` to mark an item delivered to the customer fail with an HTTP 500 error.
 
 #### Overworked Manager
 
@@ -167,5 +174,19 @@ The restaurant's manager is constantly overworked and forgets about the nutritio
 
 Sometimes messages are sent successfully from a service, but don't appear or get lost on the consumer side.
 
-With a configuration value of `OVERWORKED_MANAGER` set to `0.1` 10% of the results of the call to the cook for retrieving nutrition information get lost within the Guest experience implementation.
-E.g. a service call to the cook is issued, but the results do not arrive / are discarded.
+With a configuration value of `OVERWORKED_MANAGER` set to `0.1` 10% of the results of the calls to `Food Preparation` for retrieving nutrition information get lost within the `Guest Experience` implementation.
+E.g. a service call is issued, but the results do not arrive / are discarded in the implementation.
+
+## Reflection
+
+- How did the overall system react?
+- How was the user experience for the customer?
+- How much throughput did we have?
+
+### Patterns
+
+__TODO__
+
+## Part 3 - Decoupling via Messages
+
+__TODO__
