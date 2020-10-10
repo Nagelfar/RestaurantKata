@@ -116,7 +116,7 @@ So to summarize it again, the goals of the first part of the Kata are:
 
 At the end you should be able to connect the developed services to the customer frontend and you should have a similar experience as shown in the following video.
 
-![](https://youtu.be/PcRHigcAZ7E "Restaurant Kata demo")
+[!["Restaurant Kata demo"](Orders.png)](https://youtu.be/PcRHigcAZ7E)
 
 ## Part 2 - The fallacies of distributed computing
 
