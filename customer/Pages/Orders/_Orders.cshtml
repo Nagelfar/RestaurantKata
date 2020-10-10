@@ -25,28 +25,46 @@
                                 <th>Name</th>
                                 <th>Price</th>
                                 <th>Delivered (ID@@Time)</th>
+                                <th>Paid (ID@@Time)</th>
                             </tr>
                         </thead>
                         <tbody >
                         @functions
                         {
+                            string CssClassFor(OrderViewModel.OrderItem item)
+                            {
+                                switch (item.ReceivedAt != null, item.PaidWith != null)
+                                {
+                                    case (true, true):
+                                        return "table-success";
+                                    case(true,false):
+                                        return "table-warning";
+                                    default:
+                                        return "";
+                                }
+                            }
+
                             void RenderItem(OrderViewModel.OrderItem item)
                             {
-                                <tr>
+                                <tr class="@CssClassFor(item)">
                                     <td>@item.Name</td>
                                     <td>@item.Price €</td>
-                                    
-                                    @if(item.ReceivedAt != null)
-                                    {
-                                        <td class="table-success">
+                                    <td>
+                                        @if(item.ReceivedAt != null)
+                                        {
                                             <small >
                                                 ID @item.ReceivedAt.DeliveryId @@ @item.ReceivedAt.DeliveredOn.ToLongTimeString()
                                             </small>
-                                        </td>
-                                    } else {
-                                        <td></td>
-                                    }
-                                    
+                                        }
+                                    </td>
+                                    <td>
+                                        @if(item.PaidWith != null) 
+                                        {
+                                             <small >
+                                                ID @item.PaidWith.Bill @@ @item.PaidWith.PaidOn.ToLongTimeString()
+                                            </small>
+                                        }
+                                    </td>
                                 </tr>
                             }
                         }

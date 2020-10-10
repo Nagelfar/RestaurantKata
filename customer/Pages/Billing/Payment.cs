@@ -23,7 +23,7 @@ namespace Customer.Pages.Billing
             public int Bill { get; set; }
             public decimal Amount { get; set; }
             public PaymentMethod PaymentMethod { get; set; }
-            public int Guest { get; internal set; }
+            public int Guest { get; set; }
         }
 
         private readonly ILogger<PaymentModel> _logger;
@@ -81,7 +81,7 @@ namespace Customer.Pages.Billing
 
             _events.Append(new BillPaid(Command.Guest, Command.Bill, Command.Amount, paid.PaidOrders));
 
-            return RedirectToPage("./Orders/Detail", new { guest = Command.Guest });
+            return RedirectToPage("/Orders/Detail", new { guest = Command.Guest });
         }
 
     }

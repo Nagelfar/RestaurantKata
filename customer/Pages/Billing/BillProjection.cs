@@ -13,9 +13,15 @@ namespace Customer.Pages.Billing
         public decimal TotalSum { get; internal set; }
         public DateTime BillFrom { get; internal set; }
         public int Bill { get; set; }
-        public decimal? PaidAmount { get; private set; }
-        public IEnumerable<PaidOrder> PaidOrders { get; private set; }
-        public DateTime? PaidOn { get; private set; }
+
+        public BillPayment Payment { get; private set; }
+
+        public class BillPayment
+        {
+            public decimal PaidAmount { get; internal set; }
+            public IEnumerable<PaidOrder> PaidOrders { get; internal set; }
+            public DateTime PaidOn { get; internal set; }
+        }
 
         public static Projector<BillViewModel> OpenBillFor(int guest)
         {
@@ -55,9 +61,12 @@ namespace Customer.Pages.Billing
                 TotalSum = TotalSum,
                 BillFrom = BillFrom,
                 Bill = Bill,
-                PaidAmount = paidAmount,
-                PaidOrders = paidOrders,
-                PaidOn = paidOn
+                Payment = new BillPayment
+                {
+                    PaidAmount = paidAmount,
+                    PaidOrders = paidOrders,
+                    PaidOn = paidOn
+                }
             };
         }
 

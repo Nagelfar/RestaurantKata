@@ -19,6 +19,7 @@ namespace Customer.Pages.Billing.Components.Bills
                    ImmutableDictionary<int, BillViewModel>.Empty,
                    BillViewModel.BillsFor(guest)
                );
+            ViewBag.Guest = guest;
             return View(bills.Values.ToImmutableList());
         }
 

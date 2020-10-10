@@ -60,13 +60,13 @@ paths:
                         ],
                         "totalSum": 65.8
                     }
-        "404":
-          description: Guest is unknown
+        "400":
+          description: No unpaid, billable items for the guest
           content:
             text/html:
               schema:
                 $ref: "#/components/schemas/errorMessage"
-              example: The guest is unknown
+              example: No billable items found
   /payment/{bill}:
     parameters:
       - name: bill

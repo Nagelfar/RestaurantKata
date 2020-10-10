@@ -24,7 +24,6 @@ namespace Customer.Pages.Orders
         public List<OrderItem> FoodOrder { get; }
         public List<OrderItem> DrinkOrder { get; }
         public OrderConfirmation Confirmation { get; }
-
         public class OrderItem
         {
             public int Id { get; set; }
@@ -36,21 +35,30 @@ namespace Customer.Pages.Orders
             public decimal Price { get; set; }
             public Delivery ReceivedAt { get; set; }
 
+            public Payment PaidWith { get; set; }
+
             public static OrderItem Create(OrderPlaced.OrderItem item) => new OrderItem
             {
                 Id = item.Id,
                 Name = item.Name,
                 Nutrition = item.Nutrition,
                 Price = item.Price,
-                ReceivedAt = null
+                ReceivedAt = null,
+                PaidWith = null
             };
-
 
             public class Delivery
             {
                 public int DeliveryId { get; set; }
                 public DateTime DeliveredOn { get; set; }
             }
+
+            public class Payment
+            {
+                public int Bill { get; set; }
+                public DateTime PaidOn { get; set; }
+            }
+
         }
 
         public TimeSpan? OrderDuration
@@ -105,6 +113,28 @@ namespace Customer.Pages.Orders
             return state;
         }
 
+        private static ImmutableDictionary<int, OrderViewModel> MarkItemsAsPaid(ImmutableDictionary<int, OrderViewModel> state, BillPaid paid)
+        {
+            foreach (var paidOrder in paid.PaidOrders)
+            {
+                var order = state[paidOrder.Order];
+                foreach (var paidDrink in paidOrder.PaidDrinks)
+                {
+                    var unpaidDrink = order.DrinkOrder.FirstOrDefault(x => x.PaidWith == null && x.Id == paidDrink);
+                    if (unpaidDrink != null)
+                        unpaidDrink.PaidWith = new OrderItem.Payment { PaidOn = paid.On, Bill = paid.Bill };
+                }
+                foreach (var paidFood in paidOrder.PaidFood)
+                {
+                    var unpaidFood = order.FoodOrder.FirstOrDefault(x => x.PaidWith == null && x.Id == paidFood);
+                    if (unpaidFood != null)
+                        unpaidFood.PaidWith = new OrderItem.Payment { PaidOn = paid.On, Bill = paid.Bill };
+                }
+
+            }
+            return state;
+        }
+
         private static GuestOrders AppendOrder(GuestOrders state, OrderPlaced order)
         {
             var orders = state
@@ -130,6 +160,11 @@ namespace Customer.Pages.Orders
                state.SetItem(
                    delivery.Guest,
                    MarkAsDelivered(state.GetValueOrDefault(delivery.Guest), delivery)
+               ),
+            BillPaid payment =>
+                 state.SetItem(
+                   payment.Guest,
+                   MarkItemsAsPaid(state.GetValueOrDefault(payment.Guest), payment)
                ),
             _ => state
         };

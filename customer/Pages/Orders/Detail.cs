@@ -42,6 +42,7 @@ namespace Customer.Pages.Orders
                     {
                         OrderPlaced order => order.Guest == guest,
                         DeliveryReceived delivery => delivery.Guest == guest,
+                        BillPaid paid => paid.Guest == guest,
                         _ => false
                     }
                 )

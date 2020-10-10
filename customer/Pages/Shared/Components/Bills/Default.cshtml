@@ -2,36 +2,57 @@
 <table class="table">
     <thead>
         <tr>
-            <th>Bill</th>
+            <th>Bill id</th>
             <th>Bill From</th>
-            <th>Items</th>
-            <th>Sum</th>
+            <th>Items on bill</th>
+            <th>Total sum</th>
             <th>Paid Amount</th>
             <th>Paid On</th>
             <th>Included orders</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
-    @foreach(var bill in this.Model){
-        <tr>
-            <td>@bill.Bill</td>
-            <td>@bill.BillFrom</td>
-            <td>@bill.BilledItems</td>
-            <td>@bill.TotalSum €</td>
-            <td>
-                @if(bill.PaidAmount.HasValue){
-                    @bill.PaidAmount.Value
-                }
-            </td>
-            <td>
-                @if(bill.PaidOn.HasValue){
-                    @bill.PaidOn.Value
-                }
-            </td>
-            <td>
-                @String.Join(", ", (bill.PaidOrders?? Enumerable.Empty<Api.Billing.Model.PaidOrder>()).Select(x=>x.Order))
-            </td>
-        </tr>
-    }
-</tbody>
+        @foreach(var bill in this.Model)
+        {
+            <tr>
+                <td>@bill.Bill</td>
+                <td>@bill.BillFrom</td>
+                <td>@bill.BilledItems</td>
+                <td>@bill.TotalSum €</td>
+                <td>
+                    @if(bill.Payment != null)
+                    {
+                        @bill.Payment.PaidAmount
+                    }
+                </td>
+                <td>
+                    @if(bill.Payment != null)
+                    {
+                        @bill.Payment.PaidOn
+                    }
+                </td>
+                <td>
+                    @if(bill.Payment != null)
+                    {
+                        @String.Join(", ", bill.Payment.PaidOrders.Select(x => x.Order))
+                    }
+                </td>
+                <td>
+                    @if(bill.Payment == null)
+                    {
+                        <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#pay-bill" data-remote="@Url.Page("/Billing/Payment",new {guest = ViewBag.Guest})">
+                            Pay bill
+                        </button>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
 </table>
+
+
+<div class="modal" data-has-remote tabindex="-1" id="pay-bill">
+  <div class="modal-dialog modal-xl">
+  </div>
+</div>
