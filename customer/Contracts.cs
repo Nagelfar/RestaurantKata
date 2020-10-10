@@ -12,12 +12,18 @@ namespace Customer
         public DateTime On { get; set; } = DateTime.Now;
     }
 
-    public class MenuRetrieved : Event
+    public interface IGuestEvent
     {
-        public Menu Menu { get; set; }
+        int Guest { get; }
     }
 
-    public class OrderPlaced : Event
+    public class MenuRetrieved : Event, IGuestEvent
+    {
+        public Menu Menu { get; set; }
+        public int Guest => Menu.Guest;
+    }
+
+    public class OrderPlaced : Event, IGuestEvent
     {
         public class OrderItem
         {
@@ -36,7 +42,7 @@ namespace Customer
         public List<OrderItem> DrinkOrder { get; set; }
     }
 
-    public class DeliveryReceived : Event
+    public class DeliveryReceived : Event, IGuestEvent
     {
         public DeliveryReceived(int delivery, int guest, int order, DeliveredItems items)
         {
@@ -52,7 +58,7 @@ namespace Customer
         public int Delivery { get; }
     }
 
-    public class BillReceived : Event
+    public class BillReceived : Event, IGuestEvent
     {
         public BillReceived(int guest, int bill, List<int> orderedFood, List<int> orderedDrinks, decimal totalSum)
         {
@@ -70,7 +76,7 @@ namespace Customer
         public decimal TotalSum { get; }
     }
 
-    public class BillUpdated : Event
+    public class BillUpdated : Event, IGuestEvent
     {
         public BillUpdated(int guest, int bill, List<int> orderedFood, List<int> orderedDrinks, decimal totalSum)
         {
@@ -88,7 +94,7 @@ namespace Customer
         public decimal TotalSum { get; }
     }
 
-    public class PaymentMethodsSupported : Event
+    public class PaymentMethodsSupported : Event, IGuestEvent
     {
         public PaymentMethodsSupported(int guest, int bill, PaymentMethod[] paymentMethods)
         {
@@ -102,7 +108,7 @@ namespace Customer
         public PaymentMethod[] PaymentMethods { get; }
     }
 
-    public class BillPaid : Event
+    public class BillPaid : Event, IGuestEvent
     {
         public BillPaid(int guest, int bill, decimal amount, List<PaidOrder> paidOrders)
         {

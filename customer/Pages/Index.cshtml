@@ -4,7 +4,7 @@
     ViewData["Title"] = "Retrieve Menu";
 }
 @if(Model.Guests.Any())
-{    
+{
     <table class="table table-hover">
         <thead>
             <tr>
@@ -15,30 +15,23 @@
         </thead>
         <caption>Guests with open bills</caption>
         <tbody>
-    @foreach (var guest in Model.Guests)
-    {
-        <tr>
-            <th scope="row">@guest.Guest</th>
-            <td>@guest.GuestSince</td>
-            <td>
-                <a asp-page="Orders/Detail" asp-route-guest="@guest.Guest">
-                    @guest.Orders order(s)
-                </a>
-            </td>
-        </tr>
-    }
-    </tbody>
+            @foreach (var guest in Model.Guests)
+            {
+                <tr>
+                    <th scope="row">@guest.Guest</th>
+                    <td>@guest.GuestSince</td>
+                    <td>
+                        <a asp-page="Orders/Detail" asp-route-guest="@guest.Guest">
+                            @guest.Orders order(s)
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
     </table>
-    <div class="btn-toolbar">
-        <div class="mr-2">
-            <a class="btn btn-secondary" asp-page="Orders/Index">
-                All Orders
-            </a>
-    </div>
     <form method="POST">
         <input class="btn btn-secondary" type="submit" asp-page-handler="RetrieveMenu" value="Register as another guest" />
     </form>
-    </div>
 } else {
     <form method="POST">
         <input class="btn btn-primary" type="submit" asp-page-handler="RetrieveMenu" value="Register as first guest of the restaurant and receive the menu!" />
