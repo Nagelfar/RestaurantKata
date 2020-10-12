@@ -74,7 +74,7 @@ namespace Customer.Pages
 
             _events.Append(new MenuRetrieved { Menu = menu });
 
-            return RedirectToPage("/Orders/Detail",new { guest = menu.Guest});
+            return RedirectToPage("/Orders/Detail", new { guest = menu.Guest});
         }
 
     }

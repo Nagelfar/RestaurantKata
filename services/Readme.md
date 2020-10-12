@@ -2,13 +2,13 @@
 
 Services are documented with the [Open API Specification](https://www.openapis.org/) in the YAML-format.
 
-Note: the folling commands in the documentation are expected to be executed from the `services` directory!
+Note: the following commands in the documentation are expected to be executed from the `services` directory!
 
 ## Viewing a single service documentation
 
-To render a single documentation as HTML several options exist.
+To render a single documentation as HTML several options exist, including the following:
 
-- a quick preview can be done via the online tool <https://editor.swagger.io/>
+- a quick preview can be done via the online tool <https://editor.swagger.io/> and copy-paste of the `YAML` content
 - locally with the help of [Redoc](https://hub.docker.com/r/redocly/redoc/) and the following docker command:
 
         docker run -it --rm \
@@ -39,7 +39,7 @@ To view all service documentation in one document use the following command
 ## Building service proxies from the OpenAPI files
 
 Note: you don't need to generate service proxies in order to use `OpenApi` specifications!
-You can always hand-roll your own objects/types and us them within your project.
+You can always hand-roll your own objects/types and use them within your project.
 
 Service proxies for clients can be generated with the help of the <https://github.com/OpenAPITools/openapi-generator> tool.
 The tool can be installed or executed via the following `docker` command:
@@ -60,7 +60,6 @@ The following things need to be customized:
 - if the whole API should be generated the `global-property` setting can be omitted (see [customization](https://openapi-generator.tech/docs/customization) and [global properties](https://openapi-generator.tech/docs/globals) for details)
 
 The generated files in the `generated/<<foldername>>` folder can then be used to bootstrap your API implementation.
-
 
 ## Running a fake server
 

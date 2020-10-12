@@ -22,10 +22,22 @@ namespace csharp
 
         public IConfiguration Configuration { get; }
 
+        private void ConfigureApis(IServiceCollection services)
+        {
+            services.AddHttpClient();
+
+            var apiConfiguration = Configuration.GetSection("APIs");
+
+            services.AddHttpClient("MyDemoApi")
+                .ConfigureHttpClient(client =>
+                    client.BaseAddress = apiConfiguration.GetValue<Uri>("MyDemoApi")
+                );
+        }
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddHttpClient();
+            ConfigureApis(services);
             services.AddControllers();
         }
 

@@ -30,6 +30,7 @@ Guests represent outside users, who are interacting with the system:
 
 ### Guest experience - creating a pleasant visit
 
+Provides a menu with daily offers tailored to customers, which is compliant to the legal rules of the country.
 A manager is in charge of the restaurant and designs the menu, which describes all the items served by the restaurant.
 Especially the manager is in charge of:
 
@@ -44,7 +45,7 @@ A waitress/waiter interacts with the guest, when they order items from the menu.
 
 - takes the order for several menu items from guests,
 - forwards the food order to the food preparation,
-- responds to the customer with an estimated waiting time based on information from the cook and the waiter's experience
+- responds to the customer with an estimated waiting time, based on information from the cook and the waiter's experience
 - forwards delivery information and drink orders to Delivery
 
 ### Food preparation - cooking a delicious meal
@@ -82,7 +83,7 @@ The cashier keeps track of items a guest ordered, generates a bill and marks pay
 
 ## Part 1 - Building the system in a naive way
 
-The goal of the first exercise is to dive into the domain while you learn about the actors and how they are connected.
+The goal of the first exercise is to dive into the domain, while you learn about the actors and how they are connected.
 Your focus should ly on bringing value to the guest, and not on building a perfect distributed system!
 
 We build each actor as a standalone application and connect them together to form a distributed system.
@@ -100,15 +101,24 @@ To keep things simple from a technical point of view, the following guidelines s
 The guest is simulated by the [customer application](./customer) and communicates via the following contracts with your services:
 
 - The customer itself exposes some endpoints described [here](services/Customer.yaml), which can be called by other systems
-- [Guest experience](services/GuestExperience.yaml), [Table Service](services/TableService.yaml) and [Billing](services/Billing.yaml) define contracts that are called by the customer
+- [Guest experience](services/GuestExperience.yaml), [Table Service](services/TableService.yaml) and [Billing](services/Billing.yaml) define contracts that are called by the customer application
 - a documentation about the service description files can be read in the following [readme](./services/Readme.md)
+- start with specifying the communication contracts between the actors
+- there are [`templates`](./templates/Readme.md) for a quick start available
 - focus on creating a runnable solution and make sure you understand the problem.
   We will iterate towards a better and more robust solution in the following parts of the exercise.
 
+### Challenges & Reflection
+
+- What are the concrete duties of an actor / a component?
+- How do the contract between these components look like?
+- How are they connected?
+- How many parallel requests can the system handle?
+- What about waiting times / SLAs for each actor?
 
 ### Call to Action
 
-So to summarize it again, the goals of the first part of the Kata are:
+To summarize it, the goals of the first part of the Kata are:
 
 - to learn about the actors, rules and connections of the restaurant, while
 - building a naive distributed system based on HTTP calls,

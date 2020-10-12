@@ -20,12 +20,12 @@ namespace csharp.Controllers
 
         private readonly ILogger<WeatherForecastController> _logger;
         private readonly IConfiguration _configuration;
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly HttpClient _demoApiClient;
 
         public WeatherForecastController(ILogger<WeatherForecastController> logger, IConfiguration configuration, IHttpClientFactory httpClientFactory)
         {
-            _httpClientFactory = httpClientFactory;
             _configuration = configuration;
+            _demoApiClient = httpClientFactory.CreateClient("MyDemoApi");
             _logger = logger;
         }
 
@@ -52,9 +52,7 @@ namespace csharp.Controllers
         [HttpGet("outgoingRequest")]
         public async Task<string> GetOutgoingRequest()
         {
-            var httpClient = _httpClientFactory.CreateClient();
-
-            var response = await httpClient.GetAsync(_configuration["myTargetConfiguration"]);
+            var response = await _demoApiClient.GetAsync("");
             var content = await response.Content.ReadAsStringAsync();
             
             return content;
