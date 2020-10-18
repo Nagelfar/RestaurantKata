@@ -1,6 +1,6 @@
 version: '3'
 networks:
-  restaurant-kara:
+  restaurant-kata:
 services:
   Customer:
     image: mcr.microsoft.com/dotnet/core/sdk:3.1
@@ -11,37 +11,37 @@ services:
     working_dir: /var/www/html
     entrypoint: dotnet run
     networks:
-      - restaurant-kara
+      - restaurant-kata
 
   TableService:
     image: realfengjia/fakeit:latest
     ports:
       - "8082:8080"
     volumes:
-      - "${PWD}:/services"
+      - ./services:/services
     command: --spec /services/TableService.yaml
     networks:
-      - restaurant-kara
+      - restaurant-kata
 
   GuestExperience:
     image: realfengjia/fakeit:latest
     ports:
       - "8081:8080"
     volumes:
-      - "${PWD}:/services"
+      - ./services:/services
     command: --spec /services/GuestExperience.yaml
     networks:
-      - restaurant-kara
+      - restaurant-kata
 
   Billing:
     image: realfengjia/fakeit:latest
     ports:
       - "8083:8080"
     volumes:
-      - "${PWD}:/services"
+      - ./services:/services
     command: --spec /services/Billing.yaml
     networks:
-      - restaurant-kara
+      - restaurant-kata
 
   # c#
   # Delivery:
@@ -53,7 +53,7 @@ services:
   #   working_dir: /var/www/html
   #   entrypoint: dotnet run
   #   networks:
-  #     - restaurant-kara
+  #     - restaurant-kata
   
   # node
   # Delivery:
@@ -65,4 +65,4 @@ services:
   #   volumes:
   #     - ./services/delivery:/var/www/html:rw
   #   networks:
-  #     - restaurant-kara
+  #     - restaurant-kata
