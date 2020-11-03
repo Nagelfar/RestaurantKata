@@ -130,49 +130,47 @@ At the end you should be able to connect the developed services to the customer 
 
 ## Part 2 - The fallacies of distributed computing
 
-The goal of the second exercise is to understand how the system reacts to stress and tension and failures.
+The goal of the second exercise is to understand how the system reacts to stress, tension and failures.
 We will introduce artificial constraints, bugs and problems into your code to study the reaction of our system.
-Then we will introduce and apply patterns to improve our system and make it more robust.
+Then we introduce and apply various patterns to improve the system and make it more robust and resilient.
 
 ### Constraints / Bugs / Problems
 
-The following constraints should be implemented for the each actor and make sure that all configuration values are exposed via the mentioned environment-variable!
+The following constraints should be implemented for each actor; Ensure that configuration values are exposed via the mentioned environment-variables!
 
-#### Clumsy Delivery
+#### Slow Delivery
 
-Every once in a while the assistant manager in `Delivery` drops a prepared meal.
-Usually this happens while serving the meal to the customer, after `Billing` was notified about the delivery!
-
-The idea behind this constraint is that every once in a while expected calls in a distributed system might fail, especially if multiple calls are involved as part of the same (logical) action.
-
-From an implementation point of view this means that a notification to `Customer` with the meal gets lost, but the call to `Delivery` succeeds.
-There can be a configuration value, e.g. `CLUMSY_DELIVERY_RATIO`  set to `0.1` to drop 10% of the prepared meals.
-
-#### The overeager Cook
-
-The cook enjoys preparing food and sometimes too much is cooked for an ordered item.
-Not one piece should be wasted, so our cook simply places the same item two times on the counter, which is then picked up by `Delivery`.
-
-Sometimes in distributed systems messages or calls get duplicated and the same content is presented several times to the consumer.
-
-There should be a configuration value `OVEREAGER_COOK_RATIO` in `Table experiecne` set to e.g. `0.1`, so that 10% of the meals are prepared two times.
-When a meal is prepared two times, the same message is simply forwarded another time from `Food Preparation` to `Delivery`!
-
-#### Slow Waiter
-
-The waiter likes to go for a smoke every once in a while, usually after he took the order from the customer and he forwarded the meal items to the cook.
-So before he told `Delivery` what they need to deliver to which guest!
+The assistant manager likes to go outside on the balcony for a smoke every once in a while.
+While he is on break, he is not responding right away to the delivery & drink information from `Table Service`, but once he is back the confirms the waiter. 
 
 In distributed systems sometimes requests or messages to a service are way slower than you expect, but they still succeed.
 
-Calls to `Delivery` from the `Guest Experience` get delayed for a certain amount of time, but requests to the cook happen right away.
-With a configuration value of `SLOW_WAITER` set to e.g. `0.1` 10% of the requests to delivery start at a later point in time.
-`SLOW_WAITER_DELAY` set to e.g. `60` means that an artificial delay of 60 seconds is added to that request.
+The response from `Delivery` to the call from `Table Service` gets delayed for a certain amount of time.
+With a configuration value of `SLOW_DELIVERY` set to e.g. `0.1` 10% of the requests from `Table Service` to `Delivery` receive their response after a configured delay.
+`SLOW_DELIVERY_DELAY` set to e.g. `60` means that an artificial delay of 60 seconds is added to the response.
 
-#### Busy Cashier
+#### Busy Cook
 
-The cashier is always busy in keeping track of the bills while he is collecting and counting money.
-From time to time notifications for delivered items are not recognized by her.
+The cook enjoys preparing food and when he is 'in the zone' other requests go unnoticed, especially those annoying interruptions by the manager about nutrition information of the meals.
+
+When services are called from a consumer they are sometimes down, have bugs, response with an error or sometimes they simply do not reply at all.
+
+`BUSY_COOK` set so `0.1` indicates that 10% of the calls from `Guest Experience` to `Food Preparation` to retrieve nutrition information fail with an HTTP 500 error.
+
+#### Forgettable Waiter
+
+Sometimes our waiter forgets if he already placed an order for a guest with the cook.
+To make sure the guest receives her meal, the waiter places the order another time with `Food Preparation`.
+
+Sometimes in distributed systems messages or calls get duplicated and the same content is presented several times to the consumer.
+
+There should be a configuration value `FORGETTABLE WAITER_RATIO` in `Table Service` set to e.g. `0.1`, so that 10% of food orders are placed two times with the cook.
+This means that the same call from `Table Service` to `Food Preparation` is issued twice.
+
+#### Occupied Cashier
+
+The cashier is always busy in keeping track of the bills, while she is collecting and counting money.
+This leads to the situation that from time to time notifications for delivered items are not recognized by her.
 
 When services are called from a consumer they are sometimes down, have bugs, response with an error or sometimes they simply do not reply at all.
 
@@ -182,16 +180,18 @@ When services are called from a consumer they are sometimes down, have bugs, res
 
 The restaurant's manager is constantly overworked and forgets about the nutrition information that was received from the cook.
 
-Sometimes messages are sent successfully from a service, but don't appear or get lost on the consumer side.
+In distributed systems sometimes requests or messages to a service are way slower than you expect, but they still succeed.
 
-With a configuration value of `OVERWORKED_MANAGER` set to `0.1` 10% of the results of the calls to `Food Preparation` for retrieving nutrition information get lost within the `Guest Experience` implementation.
-E.g. a service call is issued, but the results do not arrive / are discarded in the implementation.
+The response from `Guest Experience` to the call from `Billing` about menu prices gets delayed for a certain amount of time.
+With a configuration value of `OVERWORKED_MANAGER` set to e.g. `0.1` 10% of the requests from `Billing` to `Guest Experience` receive their response after a configured delay.
+`OVERWORKED_MANAGER_DELAY` set to e.g. `60` means that an artificial delay of 60 seconds is added to the response.
 
 ## Reflection
 
 - How did the overall system react?
 - How was the user experience for the customer?
 - How much throughput did we have?
+- How did several parameters influence the stability of the system?
 
 ### Patterns
 
