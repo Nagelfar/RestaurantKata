@@ -12,6 +12,7 @@ namespace Customer
 
     [ApiController]
     [Route("api/[controller]")]
+    [Route("guest")]
     public class GuestController : ControllerBase
     {
         private readonly EventStore eventStore;
