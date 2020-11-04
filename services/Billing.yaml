@@ -60,7 +60,7 @@ paths:
                         ],
                         "totalSum": 65.8
                     }
-        "400":
+        "404":
           description: No unpaid, billable items for the guest
           content:
             text/html:
