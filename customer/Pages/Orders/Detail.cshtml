@@ -31,6 +31,16 @@
     </div>
 </div>
 
+@if(!string.IsNullOrWhiteSpace(Model.Warning))
+{
+    <div class="alert alert-warning">
+        @Model.Warning
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+
 <vc:bills guest="@Model.Guest"></vc:bills>
 
 <partial name="_Orders" for="@Model.Orders" />

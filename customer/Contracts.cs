@@ -123,4 +123,13 @@ namespace Customer
         public decimal Amount { get; }
         public List<PaidOrder> PaidOrders { get; }
     }
+
+    public class NoBillDue : Event, IGuestEvent
+    {
+        public NoBillDue(int guest)
+        {
+            Guest = guest;
+        }
+        public int Guest { get; }
+    }
 }

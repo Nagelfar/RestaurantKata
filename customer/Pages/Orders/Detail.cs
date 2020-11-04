@@ -12,6 +12,7 @@ using Microsoft.Extensions.Http;
 using Api.TableService.Model;
 using System.Collections.Immutable;
 using Customer.Pages.Billing;
+using System.Net;
 
 namespace Customer.Pages.Orders
 {
@@ -26,6 +27,7 @@ namespace Customer.Pages.Orders
         public IEnumerable<OrderViewModel> Orders { get; private set; }
         public BillViewModel Bill { get; private set; }
         public int Guest { get; private set; }
+        public string Warning { get; private set; }
 
         public DetailModel(ILogger<DetailModel> logger, IHttpClientFactory factory, EventStore events)
         {
@@ -34,7 +36,7 @@ namespace Customer.Pages.Orders
             _billingClient = factory.CreateClient("Billing");
         }
 
-        public void OnGet(int guest)
+        public void OnGet(int guest, string warning)
         {
             Orders = _events
                 .IncludeOnly(@event =>
@@ -51,22 +53,31 @@ namespace Customer.Pages.Orders
                 .ToList();
             Bill = _events.Project(default(BillViewModel),BillViewModel.OpenBillFor(guest));
             Guest = guest;
+            Warning = warning;
         }
 
         public async Task<IActionResult> OnPostRequestBillAsync(int guest)
         {
             var billContent = await _billingClient.PostAsync($"bills/{guest}", new StringContent(""));
 
-            billContent.EnsureSuccessStatusCode();
+            if(billContent.StatusCode == HttpStatusCode.NotFound)
+            {
+                _events.Append(new NoBillDue(guest));
 
-            var bill = await billContent.Content.ReadContentAsJson<Api.Billing.Model.Bill>();
+                return RedirectToPage("/Orders/Detail", new { guest = guest, warning = "No open bills!" });
+            } else {
+                billContent.EnsureSuccessStatusCode();
 
-            if(billContent.StatusCode == System.Net.HttpStatusCode.OK)
-                _events.Append(new BillReceived(guest, bill._Bill, bill.OrderedFood, bill.OrderedDrinks, bill.TotalSum));
-            else 
-                _events.Append(new BillUpdated(guest, bill._Bill, bill.OrderedFood, bill.OrderedDrinks, bill.TotalSum));
+                var bill = await billContent.Content.ReadContentAsJson<Api.Billing.Model.Bill>();
 
-            return RedirectToPage("/Orders/Detail", new { guest = guest });
+                if(billContent.StatusCode == System.Net.HttpStatusCode.OK)
+                    _events.Append(new BillReceived(guest, bill._Bill, bill.OrderedFood, bill.OrderedDrinks, bill.TotalSum));
+                else
+                    _events.Append(new BillUpdated(guest, bill._Bill, bill.OrderedFood, bill.OrderedDrinks, bill.TotalSum));
+
+
+                return RedirectToPage("/Orders/Detail", new { guest = guest });
+            }
         }
 
     }
