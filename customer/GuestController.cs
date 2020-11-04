@@ -11,6 +11,7 @@ namespace Customer
     }
 
     [ApiController]
+    // `/api/` is for backwards compatibility
     [Route("api/[controller]")]
     [Route("guest")]
     public class GuestController : ControllerBase

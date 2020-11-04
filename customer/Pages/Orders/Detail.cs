@@ -60,7 +60,9 @@ namespace Customer.Pages.Orders
         {
             var billContent = await _billingClient.PostAsync($"bills/{guest}", new StringContent(""));
 
-            if(billContent.StatusCode == HttpStatusCode.NotFound)
+            if(billContent.StatusCode == HttpStatusCode.NotFound 
+                // BadRequest is for backwards compatibility
+                || billContent.StatusCode == HttpStatusCode.BadRequest)
             {
                 _events.Append(new NoBillDue(guest));
 
