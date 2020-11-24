@@ -136,7 +136,10 @@ Then we introduce and apply various patterns to improve the system and make it m
 
 ### Constraints / Bugs / Problems
 
-The following constraints should be implemented for each actor; Ensure that configuration values are exposed via the mentioned environment-variables!
+The following constraints should be implemented for each actor, visualized in the following image.
+Ensure that configuration values are exposed via the mentioned environment-variables!
+
+![Overview of error situation in the Restaurant](Errors.png)
 
 #### Slow Delivery
 
@@ -195,7 +198,27 @@ With a configuration value of `OVERWORKED_MANAGER` set to e.g. `0.1` 10% of the 
 
 ### Patterns
 
-__TODO__
+With local, tactical patterns the stability and resilience of the system can be improved without introducing fundamental changes to the system.
+The following section outlines some ideas about potential patterns together with additional documentation:
+
+- Retry
+  Try to re-apply a request for a limited amount, sometimes combined with back-off times, e.g. <https://docs.microsoft.com/en-us/azure/architecture/patterns/retry> or <https://github.com/App-vNext/Polly/wiki/Retry>.
+- Timeout / TTL
+  Specify an explicit timeout to control the maximum duration of a request and allow a controlled termination - <https://github.com/App-vNext/Polly/wiki/Timeout>
+- Circuit Breaker
+  Instead of calling a faulty service several times, stop the communication early - <https://docs.microsoft.com/en-us/azure/architecture/patterns/circuit-breaker>, <https://github.com/App-vNext/Polly/wiki/Circuit-Breaker>
+- Correlation / Idempotency
+  Providing unique identifiers with requests allow the server to correlate or deduplicate requests - <https://tkg.codes/posts/client-side-resource-ids>, <https://chrisrichardson.net/post/microservices/patterns/2020/10/16/idempotent-consumer.html>
+- Cache
+  A cache can sometimes be used as a fallback mechanism in case of a faulty service and return a degraded result - <https://github.com/App-vNext/Polly/wiki/Cache>
+- Pipes and Filters
+  Sometimes multiple simple patterns can be combined to achieve a more resilient system - <https://github.com/App-vNext/Polly/wiki/Fallback>, <https://github.com/App-vNext/Polly/wiki/PolicyWrap>
+- Decoupled Invocation / Request & Reaction
+  Instead of using a plain RPC call and wait (in a blocking way) for the response, embrace the asynchronicity - <https://arnon.me/soa-patterns/decoupled-invocation/>, <https://arnon.me/soa-patterns/request-reaction/>
+- Transaction
+  Introduce a set of local transactions to isolate failures and allow retries <https://arnon.me/soa-patterns/transactional-service/>
+
+Note: the idea is to implement the patterns on your own and not just integrate a prebuilt library!
 
 ## Part 3 - Decoupling via Messages
 
