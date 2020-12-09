@@ -144,7 +144,7 @@ Ensure that configuration values are exposed via the mentioned environment-varia
 #### Slow Delivery
 
 The assistant manager likes to go outside on the balcony for a smoke every once in a while.
-While he is on break, he is not responding right away to the delivery & drink information from `Table Service`, but once he is back the confirms the waiter. 
+While he is on break, he is not responding right away to the delivery & drink information from `Table Service`, but once he is back the confirms the waiter.
 
 In distributed systems sometimes requests or messages to a service are way slower than you expect, but they still succeed.
 
@@ -222,4 +222,83 @@ Note: the idea is to implement the patterns on your own and not just integrate a
 
 ## Part 3 - Decoupling via Messages
 
-__TODO__
+In the 3. part of the Kata we will look into decoupling the services via messaging.
+With the help of the message broker [RabbitMQ](https://www.rabbitmq.com/) actors will communicate via commands, events or document messages.
+In addition to the communication via messages the errors and the resilience patterns introduced in the 'Fallacies of distributed computing' part should be translated into their equivalent messaging part.
+
+### Defining contracts
+
+As first step the internal contracts should be reviewed and messaging should be introduced where appropriate.
+Note: the contracts towards the customer should not be changed!
+
+Essentially defining contracts consists of the following parts:
+
+- Discuss which types of messages (Command, Event, Document) should be used for which internal communication
+- Sketch the message contracts and channels with the help of [AsyncAPI](https://www.asyncapi.com/) in one file.
+  Some information on generating documentation with AsyncAPI can be found [here](services/Readme.md).
+
+### Implement and use the contracts
+
+Now we use and introduce the async contracts into the existing implementation with the following steps
+
+- Use RabbitMQ as central Broker for all services.
+  With the following Docker command RabbitMQ can be hosted together with the management console on it's default port.
+
+      docker run -d --hostname restaurant-rabbit --name restaurant-rabbit -p 5672:5672 -p 15672:15672 rabbitmq:3-management
+
+  Note: the default user `guest` and password `guest` should be sufficient for this Kata.
+- Provision (create) the necessary exchanges, queues and bindings as defined in the `AsyncAPI`-contracts in RabbitMQ in an automated way
+- Implement the communication with RabbitMQ and re-apply existing resilience patterns
+
+### Remarks on the implementation
+
+When introducing messaging a message handler pipeline (['Pipes and Filters'](https://docs.microsoft.com/en-us/azure/architecture/patterns/pipes-and-filters)) helps to separate implementation concerns.
+E.g. each resilience pattern can be implemented as a dedicated handler and the handlers can be wired into a pipeline upon startup.
+
+```c#
+class LoggingHandler<T> : IHandleMessages<T> {
+  private readonly IHandleMessages<T> _next;
+  private readonly ILogger<T> _logger;
+  LoggingHandler( ILogger<T> logger, IHandleMessages<T> next){
+    _next = next;
+    _logger = logger;
+  }
+
+  public void Handle(T message){
+    _logger.LogInformation("About to handle message " + message);
+    try {
+      _next.Handle(message);
+      _logger.LogDebug("Successfully handled message " + message);
+    } catch (Exception e) {
+      _logger.LogException(e, "Failed on handling message " + message);
+      throw;
+    }
+  }
+}
+
+// Startup / handler wiring:
+var cookMealChain =
+  new LoggingHandler(
+    logger: loggingFactory.CreateLogger(),
+    new RetryOnErrorHandler(
+      retries: 3,
+      new TransactionalHandler(
+        new CookMealHandler(/* cook dependencies */)
+      )
+    )
+  );
+
+
+// caller code from RabbitMQ somewhere
+cookMealChain.Handle(new CookMeal(...));
+```
+
+### Call to Action
+
+To summarize the tasks of the third part:
+
+- Define new internal contracts based on message semantics
+- Implement them with the help of RabbitMQ
+- Port existing errors/bugs/constraints introduced in the 2nd part to the 3rd.
+- Fix them with existing or new, more appropriate patterns
+- Summarize and review your findings

@@ -1,10 +1,13 @@
 # Work with service specifications
 
-Services are documented with the [Open API Specification](https://www.openapis.org/) in the YAML-format.
+Services are documented in the YAML-format and we use [Open API Specification](https://www.openapis.org/) for HTTP based services and [AsyncAPI](https://www.asyncapi.com/) for messages.
+Note: separate files need to be created for the contracts.
 
 Note: the following commands in the documentation are expected to be executed from the `services` directory!
 
-## Viewing a single service documentation
+## On using OpenAPI
+
+### Viewing a single service documentation
 
 To render a single documentation as HTML several options exist, including the following:
 
@@ -19,7 +22,7 @@ To render a single documentation as HTML several options exist, including the fo
 
     Note: specify the desired service-yaml file instead of `Customer.yaml` and open the documentation at <http://localhost:8000>!
 
-## Viewing all service documentations
+### Viewing all service documentations
 
 To view all service documentation in one document use the following command
 
@@ -36,7 +39,7 @@ To view all service documentation in one document use the following command
         volbrene/redoc
 
 
-## Building service proxies from the OpenAPI files
+### Building service proxies from the OpenAPI files
 
 Note: you don't need to generate service proxies in order to use `OpenApi` specifications!
 You can always hand-roll your own objects/types and use them within your project.
@@ -61,7 +64,7 @@ The following things need to be customized:
 
 The generated files in the `generated/<<foldername>>` folder can then be used to bootstrap your API implementation.
 
-## Running a fake server
+### Running a fake server
 
 [Fakeit](https://github.com/justinfeng/fakeit) can be used to test an implementation with a fake server
 
@@ -72,3 +75,26 @@ The generated files in the `generated/<<foldername>>` folder can then be used to
 
 The fake server is reachable via <http://localhost:8010/>.
 If you want to use the provided examples of an OpenAPI file append `--use-example` as additional parameter.
+
+
+## On using AsyncAPI
+
+At the moment the tooling for AsyncApi is not as mature!
+There exist a couple of [templates and generators](https://github.com/search?q=topic%3Aasyncapi+topic%3Agenerator+topic%3Atemplate) we can be used to create local stubs.
+For not supported languages local message implementations need to be created manually.
+
+### Viewing a single service documentation
+
+A single AsyncAPI service documentation can be generated with the help of [AsyncAPI Generator](https://github.com/asyncapi/generator#cli-usage-with-docker) and the following command:
+
+    docker run --rm -it \
+        -v [ASYNCAPI SPEC FILE LOCATION]:/app/asyncapi.yml \
+        -v [GENERATED FILES LOCATION]:/app/output \
+        asyncapi/generator [COMMAND HERE]
+
+As example:
+
+    docker run --rm -it \
+        -v ${PWD}/TableService-Async.yaml:/app/asyncapi.yml \
+        -v ${PWD}/output:/app/output \
+        asyncapi/generator -o /app/output /app/asyncapi.yml @asyncapi/html-template --force-write
