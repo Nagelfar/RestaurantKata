@@ -93,8 +93,8 @@ To keep things simple from a technical point of view, the following guidelines s
 - each actor is implemented as independent runnable application, and it can be started with a simple CLI command
 - configuration parameters of an application can be set or overridden via environment variables
 - all communication is done via unsecured HTTP and the exposed port can be configured via a dedicated environment variable (e.g. `PORT` or `ASPNETCORE_URLS`)
-- logs messages are written to the console / STDOUT
-- durable persistence is not needed, so storing data in memory while hard coding e.g. the menu or prices is sufficient.
+- log messages are written to the console / `STDOUT`
+- durable persistence is not needed, so storing data in memory and hard coding e.g. the menu or prices is sufficient.
 
 ### Starting points
 
