@@ -1,4 +1,4 @@
-version: '3'
+version: '3.9'
 networks:
   restaurant-kata:
 services:
@@ -8,38 +8,43 @@ services:
       - 5000:5000
     volumes:
       - ./customer:/var/www/html:rw
+    environment:
+      - ASPNETCORE_URLS=http://+:5000
+      - APIs__GuestExperience=http://GuestExperience:4010/
+      - APIS__TableService=http://TableService:4010/
+      - APIS__Billing=http://Billing:4010/
     working_dir: /var/www/html
-    entrypoint: dotnet run
+    entrypoint: dotnet run --no-launch-profile
     networks:
       - restaurant-kata
-
+  
   TableService:
-    image: realfengjia/fakeit:latest
+    image: stoplight/prism:4
     ports:
-      - "8082:8080"
+      - "8082:4010"
     volumes:
       - ./services:/services
-    command: --spec /services/TableService.yaml
+    command: mock -h 0.0.0.0 /services/TableService.yaml
     networks:
       - restaurant-kata
 
   GuestExperience:
-    image: realfengjia/fakeit:latest
+    image: stoplight/prism:4
     ports:
-      - "8081:8080"
+      - "8081:4010"
     volumes:
       - ./services:/services
-    command: --spec /services/GuestExperience.yaml
+    command: mock -h 0.0.0.0 /services/GuestExperience.yaml
     networks:
       - restaurant-kata
 
   Billing:
-    image: realfengjia/fakeit:latest
+    image: stoplight/prism:4
     ports:
-      - "8083:8080"
+      - "8083:4010"
     volumes:
       - ./services:/services
-    command: --spec /services/Billing.yaml
+    command: mock -h 0.0.0.0 /services/Billing.yaml
     networks:
       - restaurant-kata
 

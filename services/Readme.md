@@ -66,16 +66,18 @@ The generated files in the `generated/<<foldername>>` folder can then be used to
 
 ### Running a fake server
 
-[Fakeit](https://github.com/justinfeng/fakeit) can be used to test an implementation with a fake server
+[Prism](https://github.com/stoplightio/prism) ([Docs](https://meta.stoplight.io/docs/prism/))can be used to test an implementation with a fake server
 
-    docker run -t \
-        -v "${PWD}:/services" \
-        -p 8010:8080 realfengjia/fakeit:latest \
-        --spec /services/GuestExperience.yaml
+    docker run --init --rm \
+        -v $(pwd):/tmp \
+        -p 4010:4010 \
+        stoplight/prism:4 mock \
+        -h 0.0.0.0 \
+        "/tmp/Billing.yaml"
 
-The fake server is reachable via <http://localhost:8010/>.
-If you want to use the provided examples of an OpenAPI file append `--use-example` as additional parameter.
+The fake server is reachable via <http://localhost:4010/> and returns examples of the OpenAPI Spec as response.
 
+To run all mock services at once together with the frontend use the <../docker-compose.yaml> file.
 
 ## On using AsyncAPI
 
