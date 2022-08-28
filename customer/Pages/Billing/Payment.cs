@@ -66,6 +66,26 @@ namespace Customer.Pages.Billing
 
         }
 
+        private void AssertOrFail(bool condition, string reason)
+        {
+            if (!condition)
+                throw new ArgumentException("Condition failed: " + reason);
+        }
+
+        private void EnsureContract(PaidBill bill)
+        {
+            AssertOrFail(bill.Bill >= 0, "Billing ID");
+            AssertOrFail(bill.PaidOrders != null, "Expected a value in paid orders");
+            foreach (var order in bill.PaidOrders)
+            {
+                AssertOrFail(order.Order >= 0, "An order id should be set");
+                AssertOrFail(
+                    order.PaidDrinks != null && order.PaidDrinks.Any() || order.PaidFood != null && order.PaidFood.Any(),
+                    "Expected either paid drinks or paid food as part of the order"
+                    );
+            }
+        }
+
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
@@ -78,6 +98,8 @@ namespace Customer.Pages.Billing
             });
             billHttpResponse.EnsureSuccessStatusCode();
             var paid = await billHttpResponse.Content.ReadContentAsJson<PaidBill>();
+            
+            EnsureContract(paid);
 
             _events.Append(new BillPaid(Command.Guest, Command.Bill, Command.Amount, paid.PaidOrders));
 

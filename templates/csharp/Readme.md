@@ -1,6 +1,6 @@
 # Using the template
 
-The template was bootstrapped via the following [article](https://docs.microsoft.com/en-us/aspnet/core/tutorials/first-web-api?view=aspnetcore-3.1&tabs=visual-studio-code) and the `dotnet new webapi -o .` command on MacOS.
+The template was bootstrapped via the following [article](https://docs.microsoft.com/en-us/aspnet/core/tutorials/first-web-api?view=aspnetcore-6.0&tabs=visual-studio-code) and the `dotnet new webapi -o .` command on MacOS.
 Please make sure you have all requirements installed and you have an idea about the [fundamentals](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/) of dotnet core!
 
 To customize the template for your service do the following steps:
