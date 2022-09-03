@@ -4,21 +4,20 @@ This document describes a Kata for building and learning about distributed syste
 
 Imagine the following: you are entering a restaurant to order some food and drinks.
 You pick up the menu from the table, study it and after you picked your meal, you contact the waitress to order a Wiener Schnitzel and a soda.
-After a while the assistant manager brings you the food, which was deliciously prepared by the cook.
+After a while, the assistant manager brings you the food, which was deliciously prepared by the cook.
 Once you are finished, you ask for the bill, pay in cash and leave this nice place.
-
-In this setting we have a user, the guest, who is interacting with a system.
-This system is composed of a lot of different actors, who are working together to fulfill the users needs.
+In this setting, we have a user, the guest, who is interacting with a system.
+This system is composed of a lot of different actors, who are working together to fulfill the user's needs.
 Each actor executes several tasks within their job, while they interact with other actors.
 
 ## Actors within our system
 
-In this section we describe the actors and their responsibilities in our restaurant.
-The following picture shows a coarse overview on how the actors are connected.
+In this section, we describe the actors and their responsibilities in our restaurant.
+The following picture shows a coarse overview of how the actors are connected.
 
 ![Overview of the actors in the restaurant](Example_Overview.jpg)
 
-### The guest - representing a system user
+### The guest - represents a system user
 
 The customer - the guest - is hungry and thirsty and visits the restaurant for food and drinks.
 Guests represent outside users, who are interacting with the system:
@@ -30,18 +29,18 @@ Guests represent outside users, who are interacting with the system:
 
 ### Guest experience - creating a pleasant visit
 
-Provides a menu with daily offers tailored to customers, which is compliant to the legal rules of the country.
+Provides a menu with daily offers tailored to customers, which is compliant with the legal rules of the country.
 A manager is in charge of the restaurant and designs the menu, which describes all the items served by the restaurant.
 Especially the manager is in charge of:
 
 - the menu, containing all of the items which are offered to a customer.
-  A item of the menu has a name, a nutrition information and a price.
-- to ensure the nutrition information is up-to-date with the ingredients served, details about them are retrieved from the cook.
+  An item on the menu has a name, nutrition information and a price.
+- to ensure the nutrition information is up-to-date with the ingredients served, and details about them are retrieved from the cook.
 - the cashier asks for current item prices when a bill is created.
 
 ### Table service - helping the guest at the table
 
-A waitress/waiter interacts with the guest, when they order items from the menu.
+A waitress/waiter interacts with the guest when they order items from the menu.
 
 - takes the order for several menu items from guests,
 - forwards the food order to the food preparation,
@@ -53,18 +52,18 @@ A waitress/waiter interacts with the guest, when they order items from the menu.
 A cook prepares meals in the order they are requested.
 
 - only orders for a single menu item can be placed at once
-- a meal preparation takes a defined time, which is calculated by the number of ingredients * 2.
-  As example a meal with 4 ingredients takes at least 8 seconds to prepare.
+- meal preparation takes a defined time, which is calculated by the number of ingredients * 2.
+  For example, a meal with 4 ingredients takes at least 8 seconds to prepare.
 - the restaurant has only a limited amount of cooks available.
-  As example only 2 cooks can prepare meals and they are blocked for the preparation time.
+  For example, only 2 cooks can prepare meals and they are blocked for the preparation time.
 - when food is ordered, the number of meals that are prepared before the requested one is returned.
-  As example if two meals are about to be prepared, and another order is requested, food preparation would return 3 to the waiter.
-- when a meal is prepared it is placed on the counter after it's preparation time and delivery is notified.
+  For example, if two meals are about to be prepared, and another order is requested, food preparation would return 3 to the waiter.
+- when a meal is prepared it is placed on the counter after its preparation time and delivery is notified.
 - provides a list of cookable meals with name and nutrition information
 
 ### Delivery - serving items
 
-In delivery an assistant manager ensures that all ordered items are delivered to the guest and that they are registered for billing.
+In delivery, an assistant manager ensures that all ordered items are delivered to the guest and that they are registered for billing.
 
 - watches for prepared meals from the cook and picks them up
 - prepares drinks upon request from table service
@@ -76,10 +75,10 @@ In delivery an assistant manager ensures that all ordered items are delivered to
 
 The cashier keeps track of items a guest ordered, generates a bill and marks payment.
 
-- knows up-to-date food prices, based on the managers menu
+- knows up-to-date food prices, based on the manager's menu
 - keeps track of delivered items for a guest
 - generates a bill for the guest and offers payment via different means
-- marks bill as payed
+- marks bill as paid
 
 ## Part 1 - Building the system in a naive way
 
@@ -87,10 +86,10 @@ The goal of the first exercise is to dive into the domain, while you learn about
 Your focus should ly on bringing value to the guest, and not on building a perfect distributed system!
 
 We build each actor as a standalone application and connect them together to form a distributed system.
-The existing customer application will act as representation of the user and connect to your application.
+The existing customer application will act as a representation of the user and connect to your application.
 To keep things simple from a technical point of view, the following guidelines should be respected:
 
-- each actor is implemented as independent runnable application, and it can be started with a simple CLI command
+- each actor is implemented as an independent runnable application, and it can be started with a simple CLI command
 - configuration parameters of an application can be set or overridden via environment variables
 - all communication is done via unsecured HTTP and the exposed port can be configured via a dedicated environment variable (e.g. `PORT` or `ASPNETCORE_URLS`)
 - log messages are written to the console / `STDOUT`
@@ -102,7 +101,7 @@ The guest is simulated by the [customer application](./customer) and communicate
 
 - The customer itself exposes some endpoints described [here](services/Customer.yaml), which can be called by other systems
 - [Guest experience](services/GuestExperience.yaml), [Table Service](services/TableService.yaml) and [Billing](services/Billing.yaml) define contracts that are called by the customer application
-- a documentation about the service description files can be read in the following [readme](./services/Readme.md)
+- documentation about the service description files can be read in the following [readme](./services/Readme.md)
 - start with specifying the communication contracts between the actors
 - there are [`templates`](./templates/Readme.md) for a quick start available
 - focus on creating a runnable solution and make sure you understand the problem.
@@ -111,20 +110,20 @@ The guest is simulated by the [customer application](./customer) and communicate
 ### Challenges & Reflection
 
 - What are the concrete duties of an actor / a component?
-- How do the contract between these components look like?
+- What does the contract between these components look like?
 - How are they connected?
 - How many parallel requests can the system handle?
 - What about waiting times / SLAs for each actor?
 
 ### Call to Action
 
-To summarize it, the goals of the first part of the Kata are:
+To summarize, the goals of the first part of the Kata are:
 
 - to learn about the actors, rules and connections of the restaurant, while
 - building a naive distributed system based on HTTP calls,
 - to create the basis for the following parts.
 
-At the end you should be able to connect the developed services to the customer frontend and you should have a similar experience as shown in the following video.
+In the end you should be able to connect the developed services to the customer frontend and you should have a similar experience as shown in the following video.
 
 [!["Restaurant Kata demo"](Orders.png)](https://youtu.be/PcRHigcAZ7E)
 
@@ -156,7 +155,7 @@ With a configuration value of `SLOW_DELIVERY` set to e.g. `0.1` 10% of the reque
 
 The cook enjoys preparing food and when he is 'in the zone' other requests go unnoticed, especially those annoying interruptions by the manager about nutrition information of the meals.
 
-When services are called from a consumer they are sometimes down, have bugs, response with an error or sometimes they simply do not reply at all.
+When services are called from a consumer they are sometimes down, have bugs, respond with an error or sometimes they simply do not reply at all.
 
 `BUSY_COOK` set so `0.1` indicates that 10% of the calls from `Guest Experience` to `Food Preparation` to retrieve nutrition information fail with an HTTP 500 error.
 
@@ -175,7 +174,7 @@ This means that the same call from `Table Service` to `Food Preparation` is issu
 The cashier is always busy in keeping track of the bills, while she is collecting and counting money.
 This leads to the situation that from time to time notifications for delivered items are not recognized by her.
 
-When services are called from a consumer they are sometimes down, have bugs, response with an error or sometimes they simply do not reply at all.
+When services are called from a consumer they are sometimes down, have bugs, respond with an error or sometimes they simply do not reply at all.
 
 `BUSY_CASHIER` set so `0.1` indicates that 10% of the calls from `Delivery` to `Billing` to mark an item delivered to the customer fail with an HTTP 500 error.
 
@@ -210,7 +209,7 @@ The following section outlines some ideas about potential patterns together with
 - Correlation / Idempotency
   Providing unique identifiers with requests allow the server to correlate or deduplicate requests - <https://tkg.codes/posts/client-side-resource-ids>, <https://chrisrichardson.net/post/microservices/patterns/2020/10/16/idempotent-consumer.html>
 - Cache
-  A cache can sometimes be used as a fallback mechanism in case of a faulty service and return a degraded result - <https://github.com/App-vNext/Polly/wiki/Cache>
+  A cache can sometimes be used as a fallback mechanism in case of a faulty service and returns a degraded result - <https://github.com/App-vNext/Polly/wiki/Cache>
 - Pipes and Filters
   Sometimes multiple simple patterns can be combined to achieve a more resilient system - <https://github.com/App-vNext/Polly/wiki/Fallback>, <https://github.com/App-vNext/Polly/wiki/PolicyWrap>
 - Decoupled Invocation / Request & Reaction
