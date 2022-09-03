@@ -1,0 +1,94 @@
+# this docker configuration assumes that all implementations are written with Node 16
+# and layed out within a `services` folder and have a project named after the service, e.g. `services/FoodPreparation/package.json`
+# it assumes that there exists a `npm run start` command which starts the service
+version: '3.9'
+networks:
+  restaurant-kata:
+services:
+  Customer:
+    image: mcr.microsoft.com/dotnet/sdk:6.0
+    ports:
+      - 5000:5000
+    volumes:
+      - ./customer:/var/www/html:rw
+    environment:
+      - ASPNETCORE_URLS=http://+:5000
+      - APIs__GuestExperience=http://GuestExperience:8081/
+      - APIS__TableService=http://TableService:8082/
+      - APIS__Billing=http://Billing:8083/
+    working_dir: /var/www/html
+    entrypoint: dotnet run --no-launch-profile
+    networks:
+      - restaurant-kata
+
+  FoodPreparation:
+    image: node:16
+    ports:
+      - "8085:8085"
+    volumes:
+      - ./services/FoodPreparation:/services
+    environment:
+      PORT: 8085
+      API_DELIVERY: Delivery:8084
+    working_dir: /services
+    command: bash -c "npm ci && npm run start"
+    networks:
+      - restaurant-kata
+  
+  GuestExperience:
+    image: node:16
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./services/GuestExperience:/services
+    working_dir: /services
+    environment:
+      PORT: 8081
+      API_FOODPREPERATION: FoodPreparation:8085
+    command: bash -c "npm ci && npm run start"
+    networks:
+      - restaurant-kata
+        
+  Delivery:
+    image: node:16
+    ports:
+      - "8084:8084"
+    volumes:
+      - ./services/Delivery:/services
+    working_dir: /services
+    environment:
+      PORT: 8084
+      API_CUSTOMER: Customer:5000
+      API_BILLING: Billing:8083
+    command: bash -c "npm ci && npm run start"
+    networks:
+      - restaurant-kata
+
+  Billing:
+    image: node:16
+    ports:
+      - "8083:8083"
+    volumes:
+      - ./services/Billing:/services
+    working_dir: /services
+    environment:
+      PORT: 8083
+      API_GUEST_EXPERIENCE: GuestExperience:8081
+    command: bash -c "npm ci && npm run start"
+    networks:
+      - restaurant-kata
+
+  TableService:
+    image: node:16
+    ports:
+      - "8082:8082"
+    volumes:
+      - ./services/TableService:/services
+    working_dir: /services
+    command: bash -c "npm ci && npm run start"
+    networks:
+      - restaurant-kata
+    environment:
+      PORT: 8082
+      API_DELIVERY: Delivery:8084
+      API_FOODPREPERATION: FoodPreparation:8085

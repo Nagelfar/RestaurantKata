@@ -1,0 +1,83 @@
+# this docker configuration assumes that all implementations are written with .net 6,
+# and layed out within a `services` folder and have a project named after the service, e.g. `services/FoodPreparation/FoodPreparation.csproj`
+version: '3.9'
+networks:
+  restaurant-kata:
+services:
+  Customer:
+    image: mcr.microsoft.com/dotnet/sdk:6.0
+    ports:
+      - 5000:5000
+    volumes:
+      - ./customer:/var/www/html:rw
+    environment:
+      - ASPNETCORE_URLS=http://+:5000
+      - APIs__GuestExperience=http://GuestExperience:8081/
+      - APIS__TableService=http://TableService:8082/
+      - APIS__Billing=http://Billing:8083/
+    working_dir: /var/www/html
+    entrypoint: dotnet run --no-launch-profile
+    networks:
+      - restaurant-kata
+
+  FoodPreparation:
+    image: mcr.microsoft.com/dotnet/sdk:6.0
+    ports:
+      - "8085:8085"
+    volumes:
+      - ./services:/services
+    environment:
+      API_DELIVERY: Delivery:8084
+    entrypoint: dotnet run --project services/FoodPreparation/FoodPreparation.csproj
+    networks:
+      - restaurant-kata
+  
+  GuestExperience:
+    image: mcr.microsoft.com/dotnet/sdk:6.0
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./services:/services
+    environment:
+      API_FOODPREPERATION: FoodPreparation:8085
+    entrypoint: dotnet run --project services/GuestExperience/GuestExperience.csproj
+    networks:
+      - restaurant-kata
+        
+  Delivery:
+    image: mcr.microsoft.com/dotnet/sdk:6.0
+    ports:
+      - "8084:8084"
+    volumes:
+      - ./services:/services
+    environment:
+      API_CUSTOMER: Customer:5000
+      API_BILLING: Billing:8083
+    entrypoint: dotnet run --project services/Delivery/Delivery.csproj
+    networks:
+      - restaurant-kata
+
+  Billing:
+    image: mcr.microsoft.com/dotnet/sdk:6.0
+    ports:
+      - "8083:8083"
+    volumes:
+      - ./services:/services
+    environment:
+      API_GUEST_EXPERIENCE: GuestExperience:8081
+    entrypoint: dotnet run --project services/Billing/Billing.csproj
+    networks:
+      - restaurant-kata
+
+  TableService:
+    image: mcr.microsoft.com/dotnet/sdk:6.0
+    ports:
+      - "8082:8082"
+    volumes:
+      - ./services:/services
+    entrypoint: dotnet run --project services/TableService/TableService.csproj
+    networks:
+      - restaurant-kata
+    environment:
+      API_DELIVERY: Delivery:8084
+      API_FOODPREPERATION: FoodPreparation:8085
