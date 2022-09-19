@@ -85,7 +85,7 @@ The cashier keeps track of items a guest ordered, generates a bill and marks pay
 The goal of the first exercise is to dive into the domain, while you learn about the actors and how they are connected.
 Your focus should ly on bringing value to the guest, and not on building a perfect distributed system!
 
-We build each actor as a standalone application and connect them together to form a distributed system.
+We build each actor as a standalone application and connect them to form a distributed system.
 The existing customer application will act as a representation of the user and connect to your application.
 To keep things simple from a technical point of view, the following guidelines should be respected:
 
@@ -123,7 +123,7 @@ To summarize, the goals of the first part of the Kata are:
 - building a naive distributed system based on HTTP calls,
 - to create the basis for the following parts.
 
-In the end you should be able to connect the developed services to the customer frontend and you should have a similar experience as shown in the following video.
+In the end, you should be able to connect the developed services to the customer frontend and you should have a similar experience as shown in the following video.
 
 [!["Restaurant Kata demo"](Orders.png)](https://youtu.be/PcRHigcAZ7E)
 
@@ -136,14 +136,14 @@ Then we introduce and apply various patterns to improve the system and make it m
 ### Constraints / Bugs / Problems
 
 The following constraints should be implemented for each actor, visualized in the following image.
-Ensure that configuration values are exposed via the mentioned environment-variables!
+Ensure that configuration values are exposed via the mentioned environment variables!
 
 ![Overview of error situation in the Restaurant](Errors.png)
 
 #### Slow Delivery
 
 The assistant manager likes to go outside on the balcony for a smoke every once in a while.
-While he is on break, he is not responding right away to the delivery & drink information from `Table Service`, but once he is back the confirms the waiter.
+While he is on break, he is not responding right away to the delivery & drink information from `Table Service`, but once he is back he will confirm to the waiter.
 
 In distributed systems sometimes requests or messages to a service are way slower than you expect, but they still succeed.
 
@@ -213,7 +213,7 @@ The following section outlines some ideas about potential patterns together with
 - Pipes and Filters
   Sometimes multiple simple patterns can be combined to achieve a more resilient system - <https://github.com/App-vNext/Polly/wiki/Fallback>, <https://github.com/App-vNext/Polly/wiki/PolicyWrap>
 - Decoupled Invocation / Request & Reaction
-  Instead of using a plain RPC call and wait (in a blocking way) for the response, embrace the asynchronicity - <https://arnon.me/soa-patterns/decoupled-invocation/>, <https://arnon.me/soa-patterns/request-reaction/>
+  Instead of using a plain RPC call and waiting (in a blocking way) for the response, embrace the asynchronicity - <https://arnon.me/soa-patterns/decoupled-invocation/>, <https://arnon.me/soa-patterns/request-reaction/>
 - Transaction
   Introduce a set of local transactions to isolate failures and allow retries <https://arnon.me/soa-patterns/transactional-service/>
 
@@ -222,12 +222,12 @@ Note: the idea is to implement the patterns on your own and not just integrate a
 ## Part 3 - Decoupling via Messages
 
 In the 3. part of the Kata we will look into decoupling the services via messaging.
-With the help of the message broker [RabbitMQ](https://www.rabbitmq.com/) actors will communicate via commands, events or document messages.
-In addition to the communication via messages the errors and the resilience patterns introduced in the 'Fallacies of distributed computing' part should be translated into their equivalent messaging part.
+With the help of the message broker, [RabbitMQ](https://www.rabbitmq.com/) actors will communicate via commands, events or document messages.
+In addition to the communication via messages, the errors and the resilience patterns introduced in the 'Fallacies of distributed computing' part should be translated into their equivalent messaging part.
 
 ### Defining contracts
 
-As first step the internal contracts should be reviewed and messaging should be introduced where appropriate.
+As the first step the internal contracts should be reviewed and messaging should be introduced where appropriate.
 Note: the contracts towards the customer should not be changed!
 
 Essentially defining contracts consists of the following parts:
@@ -240,8 +240,8 @@ Essentially defining contracts consists of the following parts:
 
 Now we use and introduce the async contracts into the existing implementation with the following steps
 
-- Use RabbitMQ as central Broker for all services.
-  With the following Docker command RabbitMQ can be hosted together with the management console on it's default port.
+- Use RabbitMQ as the central Broker for all services.
+  With the following Docker command, RabbitMQ can be hosted together with the management console on its default port.
 
       docker run -d --hostname restaurant-rabbit --name restaurant-rabbit -p 5672:5672 -p 15672:15672 rabbitmq:3-management
 
