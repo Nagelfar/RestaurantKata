@@ -96,9 +96,18 @@ namespace Customer.Pages.Billing
                 Amount = Command.Amount,
                 PaymentMethod = Command.PaymentMethod
             });
-            billHttpResponse.EnsureSuccessStatusCode();
+            if (!billHttpResponse.IsSuccessStatusCode)
+            {
+                var content = await billHttpResponse.Content.ReadAsStringAsync();
+                throw new HttpRequestException(
+                    $"Expected a success status code but got {billHttpResponse.StatusCode} instead with body:\n\n{content}",
+                    inner: null,
+                    statusCode: billHttpResponse.StatusCode
+                );
+            }
+
             var paid = await billHttpResponse.Content.ReadContentAsJson<PaidBill>();
-            
+
             EnsureContract(paid);
 
             _events.Append(new BillPaid(Command.Guest, Command.Bill, Command.Amount, paid.PaidOrders));
