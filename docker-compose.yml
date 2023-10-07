@@ -1,20 +1,23 @@
-version: '3.9'
+version: '3'
 networks:
   restaurant-kata:
+    driver: bridge
+    ipam:
+      driver: default
 services:
-  Customer:
-    image: mcr.microsoft.com/dotnet/sdk:6.0
+  customer-actor:
+    build: customer
     ports:
       - 5000:5000
-    volumes:
-      - ./customer:/var/www/html:rw
+    # volumes:
+    #   - ./customer:/var/www/html:rw
     environment:
       - ASPNETCORE_URLS=http://+:5000
-      - APIs__GuestExperience=http://GuestExperience:4010/
+      - APIs__GuestExperience=http://guestexperience:4010/
       - APIS__TableService=http://TableService:4010/
       - APIS__Billing=http://Billing:4010/
-    working_dir: /var/www/html
-    entrypoint: dotnet run --no-launch-profile
+    # working_dir: /var/www/html
+    # entrypoint: dotnet run --no-launch-profile
     networks:
       - restaurant-kata
   
@@ -28,7 +31,7 @@ services:
     networks:
       - restaurant-kata
 
-  GuestExperience:
+  guestexperience:
     image: stoplight/prism:4
     ports:
       - "8081:4010"

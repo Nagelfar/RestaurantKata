@@ -5,8 +5,8 @@ version: '3.9'
 networks:
   restaurant-kata:
 services:
-  Customer:
-    image: mcr.microsoft.com/dotnet/sdk:6.0
+  customer-actor:
+    build: customer
     ports:
       - 5000:5000
     volumes:
@@ -17,7 +17,7 @@ services:
       - APIS__TableService=http://TableService:8082/
       - APIS__Billing=http://Billing:8083/
     working_dir: /var/www/html
-    entrypoint: dotnet run --no-launch-profile
+    # entrypoint: dotnet run --no-launch-profile
     networks:
       - restaurant-kata
 

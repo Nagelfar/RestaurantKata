@@ -1,11 +1,11 @@
-# this docker configuration assumes that all implementations are written with .net 6,
+# this docker configuration assumes that all implementations are written with .net 7,
 # and layed out within a `services` folder and have a project named after the service, e.g. `services/FoodPreparation/FoodPreparation.csproj`
 version: '3.9'
 networks:
   restaurant-kata:
 services:
-  Customer:
-    image: mcr.microsoft.com/dotnet/sdk:6.0
+  customer-actor:
+    build: customer
     ports:
       - 5000:5000
     volumes:
@@ -21,7 +21,7 @@ services:
       - restaurant-kata
 
   FoodPreparation:
-    image: mcr.microsoft.com/dotnet/sdk:6.0
+    image: mcr.microsoft.com/dotnet/sdk:7.0
     ports:
       - "8085:8085"
     volumes:
@@ -33,7 +33,7 @@ services:
       - restaurant-kata
   
   GuestExperience:
-    image: mcr.microsoft.com/dotnet/sdk:6.0
+    image: mcr.microsoft.com/dotnet/sdk:7.0
     ports:
       - "8081:8081"
     volumes:
@@ -45,7 +45,7 @@ services:
       - restaurant-kata
         
   Delivery:
-    image: mcr.microsoft.com/dotnet/sdk:6.0
+    image: mcr.microsoft.com/dotnet/sdk:7.0
     ports:
       - "8084:8084"
     volumes:
@@ -58,7 +58,7 @@ services:
       - restaurant-kata
 
   Billing:
-    image: mcr.microsoft.com/dotnet/sdk:6.0
+    image: mcr.microsoft.com/dotnet/sdk:7.0
     ports:
       - "8083:8083"
     volumes:
@@ -70,7 +70,7 @@ services:
       - restaurant-kata
 
   TableService:
-    image: mcr.microsoft.com/dotnet/sdk:6.0
+    image: mcr.microsoft.com/dotnet/sdk:7.0
     ports:
       - "8082:8082"
     volumes:
