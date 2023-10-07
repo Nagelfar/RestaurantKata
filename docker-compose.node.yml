@@ -22,7 +22,7 @@ services:
       - restaurant-kata
 
   FoodPreparation:
-    image: node:16
+    image: node:18
     ports:
       - "8085:8085"
     volumes:
@@ -36,7 +36,7 @@ services:
       - restaurant-kata
   
   GuestExperience:
-    image: node:16
+    image: node:18
     ports:
       - "8081:8081"
     volumes:
@@ -50,7 +50,7 @@ services:
       - restaurant-kata
         
   Delivery:
-    image: node:16
+    image: node:18
     ports:
       - "8084:8084"
     volumes:
@@ -65,7 +65,7 @@ services:
       - restaurant-kata
 
   Billing:
-    image: node:16
+    image: node:18
     ports:
       - "8083:8083"
     volumes:
@@ -79,7 +79,7 @@ services:
       - restaurant-kata
 
   TableService:
-    image: node:16
+    image: node:18
     ports:
       - "8082:8082"
     volumes:
