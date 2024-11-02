@@ -74,11 +74,11 @@ namespace Customer.Pages.Orders
                 if (receivedAtForItems.All(x => x != null))
                 {
                     var minReceived = receivedAtForItems.Min(x => x.DeliveredOn);
+                    var minTime = minReceived < this.OrderTime ? minReceived : this.OrderTime;
                     var maxReceived = receivedAtForItems.Max(x => x.DeliveredOn);
-                    var duration = maxReceived.Subtract(minReceived);
+                    var duration = maxReceived.Subtract(minTime);
 
                     return duration;
-
                 }
                 else return null;
             }
