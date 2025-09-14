@@ -13,7 +13,7 @@ One template uses a C# implementation based on [.NET Core](https://dotnet.micros
 - customize environment variables on execution (in MacOs / Linux) via e.g. `APIS__MyDemoApi=http://orf.at dotnet run`
 - copy the template into another folder & rename the `csharp`-namespace and `csharp.csproj` into something more meaningful
 
-## NodeJS
+## NodeJS/Typescript
 
 One template uses [Node.JS](https://nodejs.org/) as implemenation
 
