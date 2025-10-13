@@ -125,6 +125,8 @@ To summarize, the goals of the first part of the Kata are:
 
 In the end, you should be able to connect the developed services to the customer frontend and you should have a similar experience as shown in the following video.
 
+**Note**: if you have problems on Mac Os running the `customer` service you might having [Airplay]([url](https://stackoverflow.com/questions/72369320/why-always-something-is-running-at-port-5000-on-my-mac)) running. Either switch off Airplay or map the customer application to a different port like `5001`.
+
 [!["Restaurant Kata demo"](Orders.png)](https://youtu.be/PcRHigcAZ7E)
 
 ## Part 2 - The fallacies of distributed computing
