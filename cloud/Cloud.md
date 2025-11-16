@@ -54,7 +54,7 @@ Afterwards you should get a screen similar to this screen that allows you to 1) 
 
 ![Run functions](functions_details_run.png)
 
-**Assignment A** 
+**Assignment A**
 1. try to understand the functions default code,
 2. play around a bit with invoking the function via the Web-Portal,
 3. invoke the function via the URL from your laptop (e.g. using `curl` or any other tool for calling HTTP-APIs),
@@ -110,7 +110,7 @@ Then we add the container registry
 
     az provider register --namespace Microsoft.ContainerRegistry
     az acr create --name das25<group-number> --resource-group dsa --sku Basic
-   
+
 ### Build and Push Images to the registry
 
 Now we have a container registry that can host our application images - let's prepare the images and push them!
@@ -119,26 +119,20 @@ On your hosts CLI make sure your logged in the container registry using the foll
 
     az acr login --name das25<group-number>
 
-When we build images on our machine we need to make sure that containers are build with `linux/arm64`. 
+When we build images on our machine we need to make sure that containers are build with `linux/arm64`.
 One way to achieve this can be done via multi builds, that can be enabled via the following command
 
     docker buildx create --use
 
-Now we can build and push all docker images from our applications
+Now we can build and push all docker images from our applications.
+Let's start with the customer application - from the repository root:
 
-//    docker buildx build --platform linux/amd64,linux/arm64 . -t restaurant-implementation
-    docker buildx build --platform linux/amd64,linux/arm64 --tag das25<group-number>.azurecr.io/restaurant/restaurant-implementation --push . 
-//  docker buildx build --platform linux/amd64,linux/arm64 customer -t restaurant-customer
-    docker buildx build --platform linux/amd64,linux/arm64 --tag das25<group-number>.azurecr.io/restaurant/restaurant-customer:latest --push customer 
+    docker buildx build --platform linux/amd64,linux/arm64 --tag das25<group-number>.azurecr.io/restaurant/restaurant-customer:latest --push customer
 
+Now you need to do the same for all of your services
 
-Then push the image to the container registry
+    docker buildx build --platform linux/amd64,linux/arm64 --tag das25<group-number>.azurecr.io/restaurant/restaurant-<service actor>:latest --push <service folder>
 
-    docker tag restaurant-implementation dsa4cf.azurecr.io/restaurant/restaurant-implementation
-    docker push --platform linux/amd64,linux/arm64 dsa4cf.azurecr.io/restaurant/restaurant-implementation
-
-    docker tag restaurant-customer dsa4cf.azurecr.io/restaurant/restaurant-customer
-    docker push --platform linux/amd64,linux/arm64 dsa4cf.azurecr.io/restaurant/restaurant-customer
 
 #### Verify images work locally
 
@@ -150,37 +144,81 @@ Now pull and start the images you've pushed to the registry back to your machine
 
 ### Prepare the Container App to run our images
 
-    az containerapp create
+#### Using the UI
+
+Let's create the customer app first in your resource group!
+Choose a name for the customer app, e.g. `customer-application`and select `Germany West Central` as region.
+
+![Create a Container App](container_app_create.png)
+
+Name the container-app `customer-application` as well and select the correct image from your previously created registry.
+
+![Configure Customer App](container_app_container.png)
+
+For now we allow public ingress on port `8080` to be able to easily test our deployed application.
+
+![Enable Public Ingress](container_app_ingress.png)
+
+After creating the application you should be able to browse the URL and see the start screen of the customer application!
+
+Now continue to setup the other services from the Kata in the same way.
+
+After you've deployed all services you need to configure the environment variables so that the point to the correct endpoints.
+You can do this by editing the existing image and setting the environment variables:
+
+![Setting Environment Variables](functions_environment_variables.png)
+
+Afterwards you should be able to use the customer application normally!
+
+#### Using the CLI
+
+First we need to create the environment the app uses
+
+    az containerapp env create \
+        --name dsa-app-environment \
+        --resource-group dsa \
+        --enable-workload-profiles \
+        --location "germanywestcentral"
+
+Then we create a storage account for the apps runtime
+
+    az storage account create \
+        --name dsastorageaccount25<group-number> \
+        --location germanywestcentral \
+        --resource-group dsa \
+        --sku Standard_LRS \
+        --allow-blob-public-access false \
+        --allow-shared-key-access false
+
+Now we need to create a managed-identity that runs our application and has access to resources
+
+    principalId=$(az identity create --name dsa-user --resource-group dsa --location germanywestcentral --query principalId -o tsv)
+    acrId=$(az acr show --name dsa25<group-number> --query id --output tsv)
+    az role assignment create --assignee-object-id $principalId --assignee-principal-type ServicePrincipal --role acrpull --scope $acrId
+    storageId=$(az storage account show --resource-group dsa --name dsastorageaccount25<group-number> --query 'id' -o tsv)
+    az role assignment create --assignee-object-id $principalId --assignee-principal-type ServicePrincipal --role "Storage Blob Data Owner" --scope $storageId
 
 
-Run Image with correct configuration (locally)
 
-    docker run --rm -it \
-        -p 5100:5100 \
-        -e ASPNETCORE_URLS=http://+:5100 \
-        -e DOTNET_ENVIRONMENT=DockerLocal \
-        -e APIS__FoodPreparation="http://host.docker.internal:5100/FoodPreparation/" \
-        -e APIS__Delivery="http://host.docker.internal:5100/delivery/" \
-        -e APIs__GuestExperience="http://host.docker.internal:5100/guestexperience/" \
-        -e APIS__TableService="http://host.docker.internal:5100/tableservice/" \
-        -e APIS__Billing="http://host.docker.internal:5100/billing/" \
-        -e APIS__Customer="http://host.docker.internal:5000/" \
-        restaurant-implementation
- 
+az functionapp create --name <APP_NAME> --storage-account <STORAGE_NAME> --environment MyContainerappEnvironment --workload-profile-name "Consumption" --resource-group AzureFunctionsContainers-rg --functions-version 4 --assign-identity $UAMI_RESOURCE_ID
 
-Run customer
+Finally we create the actual container app for the `customer` application using the environment we specified earlier and the image we pushed
 
-    docker run --rm -it \
-        -p 5000:5000 \
-        -e ASPNETCORE_URLS=http://+:5000 \
-        -e DOTNET_ENVIRONMENT=DockerLocal \
-        -e APIs__GuestExperience="http://host.docker.internal:5100/guestexperience/" \
-        -e APIS__TableService="http://host.docker.internal:5100/tableservice/" \
-        -e APIS__Billing="http://host.docker.internal:5100/billing/" \
-        restaurant-customer
- 
+    UAMI_RESOURCE_ID=$(az identity show --name dsa-user --resource-group dsa --query id -o tsv)
 
- Application URLs
+    az containerapp create \
+        --resource-group dsa \
+        --name customer-app \
+        --environment dsa-app-environment \
+        --registry-identity $UAMI_RESOURCE_ID \
+        --registry-server dsa25<group-number>.azurecr.io \
+        --image dsa25<group-number>.azurecr.io/restaurant/restaurant-customer:latest \
+        --target-port 8080 \
+        --ingress external \
+        --workload-profile-name "Consumption" \
+        --query properties.configuration.ingress.fqdn
 
- https://implementation.wonderfuldesert-8dec7f6a.westeurope.azurecontainerapps.io
- https://customer.wonderfuldesert-8dec7f6a.westeurope.azurecontainerapps.io 
+After running this command successfully you should see a message similar to _Container app created. Access your app at https://customer-app.<..some subdomain>.germanywestcentral.azurecontainerapps.io/_.
+Clicking this link should take you to the customer start screen!
+
+Now repeat the `az containerapp create` command for all the other services and then configure the paths to the other services using environment variables in the UI.
