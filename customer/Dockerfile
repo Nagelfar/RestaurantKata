@@ -6,7 +6,7 @@ EXPOSE 5000
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 COPY ["Customer.csproj", "./"]
-RUN dotnet restore "Customer.csproj"
+RUN dotnet restore --disable-parallel -f -v d "Customer.csproj"
 COPY . .
 WORKDIR "/src/"
 RUN dotnet build "Customer.csproj" -c Release -o /app/build
