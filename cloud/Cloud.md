@@ -172,6 +172,8 @@ Afterwards you should be able to use the customer application normally!
 
 #### Using the CLI
 
+This follows loosely this article: https://learn.microsoft.com/en-us/azure/azure-functions/functions-deploy-container-apps?tabs=acr%2Cbash&pivots=programming-language-powershell
+
 First we need to create the environment the app uses
 
     az containerapp env create \
@@ -222,3 +224,11 @@ After running this command successfully you should see a message similar to _Con
 Clicking this link should take you to the customer start screen!
 
 Now repeat the `az containerapp create` command for all the other services and then configure the paths to the other services using environment variables in the UI.
+
+## Cleanup
+
+Don't forget to manually delete your resource group once your done.
+This ensures that your not paying/consuming any unnecessary resources.
+You can delete either via the UI or by using the following command in the CLI
+
+    az group delete --name dsa
