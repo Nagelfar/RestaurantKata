@@ -81,6 +81,7 @@ For each modification we will invoke the function several times and capture our 
 ## Execute the Kata in the cloud
 
 We will deploy the first version (if you dare: the second version) of the Kata as distributed application in Azure.
+This time we will use [Azure Container Apps](https://learn.microsoft.com/en-us/azure/container-apps/overview), a service that hosts prepared containers in the cloud.
 
 For this exercise you can either use the Azure Portal/the UI - or follow the proposed `az` CLI commands!
 
@@ -143,6 +144,8 @@ Now pull and start the images you've pushed to the registry back to your machine
 ![Container on Registry Dialog](container_on_registry.png)
 
 ### Prepare the Container App to run our images
+
+Now we will create the actual `container app` to run our services.
 
 #### Using the UI
 
