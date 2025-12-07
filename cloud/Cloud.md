@@ -94,7 +94,7 @@ First we need to create a private container registry to hold our container image
 Search for 'Container Registry' and create a new one.
 
 - Create a new resource group that will host your application (in the screenshot `dsa` is used)
-- You need to provide a unique registry name: use `das25<group-number>`
+- You need to provide a unique registry name: use `dsa25<group-number>`
 - Make sure you choose an appropriate region (e.g. `West Europe` or `Austria East`)
 - Pricing should be the `Basic` plan
 - The rest of the settings can be kept with the defaults
@@ -110,7 +110,7 @@ First create a resource group to hold our application
 Then we add the container registry
 
     az provider register --namespace Microsoft.ContainerRegistry
-    az acr create --name das25<group-number> --resource-group dsa --sku Basic
+    az acr create --name dsa25<group-number> --resource-group dsa --sku Basic
 
 ### Build and Push Images to the registry
 
@@ -118,7 +118,7 @@ Now we have a container registry that can host our application images - let's pr
 
 On your hosts CLI make sure your logged in the container registry using the following command
 
-    az acr login --name das25<group-number>
+    az acr login --name dsa25<group-number>
 
 When we build images on our machine we need to make sure that containers are build with `linux/arm64`.
 One way to achieve this can be done via multi builds, that can be enabled via the following command
@@ -128,18 +128,18 @@ One way to achieve this can be done via multi builds, that can be enabled via th
 Now we can build and push all docker images from our applications.
 Let's start with the customer application - from the repository root:
 
-    docker buildx build --platform linux/amd64,linux/arm64 --tag das25<group-number>.azurecr.io/restaurant/restaurant-customer:latest --push customer
+    docker buildx build --platform linux/amd64,linux/arm64 --tag dsa25<group-number>.azurecr.io/restaurant/restaurant-customer:latest --push customer
 
 Now you need to do the same for all of your services
 
-    docker buildx build --platform linux/amd64,linux/arm64 --tag das25<group-number>.azurecr.io/restaurant/restaurant-<service actor>:latest --push <service folder>
+    docker buildx build --platform linux/amd64,linux/arm64 --tag dsa25<group-number>.azurecr.io/restaurant/restaurant-<service actor>:latest --push <service folder>
 
 
 #### Verify images work locally
 
 Now pull and start the images you've pushed to the registry back to your machine to verify everything worked fine sofar.
 
-    docker pull das25<group-number>.azurecr.io/restaurant/restaurant-customer:latest
+    docker pull dsa25<group-number>.azurecr.io/restaurant/restaurant-customer:latest
 
 ![Container on Registry Dialog](container_on_registry.png)
 
